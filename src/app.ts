@@ -9,7 +9,7 @@ class App {
   public app: express.Application
   public transactionRoutes: TransactionRoutes = new TransactionRoutes()
   public avatarRoutes: AvatarRoutes = new AvatarRoutes()
-  public mongoUrl: string = 'mongodb://localhost:27017/mvs'
+  public mongoUrl: string = (process.env.MONGO_URL) ? process.env.MONGO_URL : 'mongodb://localhost:27017/mvs'
 
   constructor() {
     this.app = express()
