@@ -2,6 +2,7 @@ import * as express from "express"
 import * as bodyParser from "body-parser"
 import { TransactionRoutes } from "./routes/transaction.routes"
 import { AvatarRoutes } from "./routes/avatar.routes"
+import { CertificateRoutes } from "./routes/certificate.routes"
 import * as mongoose from "mongoose"
 
 class App {
@@ -9,6 +10,7 @@ class App {
   public app: express.Application
   public transactionRoutes: TransactionRoutes = new TransactionRoutes()
   public avatarRoutes: AvatarRoutes = new AvatarRoutes()
+  public certificateRoutes: CertificateRoutes = new CertificateRoutes()
   public mongoUrl: string = (process.env.MONGO_URL) ? process.env.MONGO_URL : 'mongodb://localhost:27017/mvs'
 
   constructor() {
@@ -16,6 +18,7 @@ class App {
     this.config()
     this.transactionRoutes.routes(this.app)
     this.avatarRoutes.routes(this.app)
+    this.certificateRoutes.routes(this.app)
     this.mongoSetup()
   }
 
