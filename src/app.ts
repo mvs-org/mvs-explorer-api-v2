@@ -1,15 +1,18 @@
 import * as express from "express"
 import * as bodyParser from "body-parser"
+import { TransactionRoutes } from "./routes/transaction.routes"
 import * as mongoose from "mongoose"
 
 class App {
 
   public app: express.Application
+  public transactionRoutes: TransactionRoutes = new TransactionRoutes()
   public mongoUrl: string = 'mongodb://localhost:27017/mvs'
 
   constructor() {
     this.app = express()
     this.config()
+    this.transactionRoutes.routes(this.app)
     this.mongoSetup()
   }
 
