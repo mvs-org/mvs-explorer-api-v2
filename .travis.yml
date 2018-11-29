@@ -6,7 +6,7 @@ jobs:
   - stage: build docker image
     script:
     - docker login -u $DOCKER_USER -p $DOCKER_PASS
-    - export REPO=cangr/mvsd-mongo-sync
+    - export REPO=mvsorg/mvs-explorer-api-v2
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo
       $TRAVIS_BRANCH; fi`
     - docker build -f Dockerfile -t $REPO:$TAG .
