@@ -4,6 +4,7 @@ import { TransactionRoutes } from "./routes/transaction.routes"
 import { AvatarRoutes } from "./routes/avatar.routes"
 import { CertificateRoutes } from "./routes/certificate.routes"
 import { MITRoutes } from "./routes/mit.routes"
+import { BlockRoutes } from "./routes/block.routes"
 import * as mongoose from "mongoose"
 
 class App {
@@ -12,6 +13,7 @@ class App {
   public transactionRoutes: TransactionRoutes = new TransactionRoutes()
   public avatarRoutes: AvatarRoutes = new AvatarRoutes()
   public mitRoutes: MITRoutes = new MITRoutes()
+  public blockRoutes: BlockRoutes = new BlockRoutes()
   public certificateRoutes: CertificateRoutes = new CertificateRoutes()
   public mongoUrl: string = (process.env.MONGO_URL) ? process.env.MONGO_URL : 'mongodb://localhost:27017/mvs'
 
@@ -21,6 +23,7 @@ class App {
     this.transactionRoutes.routes(this.app)
     this.avatarRoutes.routes(this.app)
     this.mitRoutes.routes(this.app)
+    this.blockRoutes.routes(this.app)
     this.certificateRoutes.routes(this.app)
     this.mongoSetup()
   }
