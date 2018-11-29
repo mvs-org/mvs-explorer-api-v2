@@ -1,0 +1,15 @@
+sudo: required
+services:
+- docker
+jobs:
+  include:
+  - stage: build docker image
+    script:
+    - docker login -u $DOCKER_USER -p $DOCKER_PASS
+    - export REPO=cangr/mvsd-mongo-sync
+    - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo
+      $TRAVIS_BRANCH; fi`
+    - docker build -f Dockerfile -t $REPO:$TAG .
+    - docker push $REPO
+env:
+  secure: vHP4n1Sg1O7i8ddj11oyy2dn+FxZsl7ETDgNju8PcQYS5o09HyqsbRuAGsJ+VQ703fT1OMLEj7WuZBFNGYP0/XdB+NNBiPAx6JjkLA91sfGMjIFZfP1wsN/ciGqVqwXy3ZUaSSIyycpqVT4wGeFjCSnbRhywt7bL28VKwQxLS7A4iEkN1UxJlA6ojG4HLrAJc1iOjSZX0MPmVLk+27leVD+7LOlyCRC+s9I/11/F8hOA0z3EKiSywPtDDvPvOfWtLIkJ+zH8MBX+DlfqXNVwhbWPGnM3qsD8DYpnkS9Rz1DnIF1QzgHR5tdqBIY4Yhlz9kwtdcVDIVEDkdklFtehKMqazwk0qMuOaTFDHcWkKv8Y+xdyAqO6PWpNg3jCuB6I4uATW6r6fZKFi4M4TJgkuF7zPCKLtOdW5iK4ml4HkVknNdaJPmPz+YB971JoWpIt5paXHPifRrOVIyIV2sHjRl1gmuaqxq0lpRUmnj/+yfC7L4Qy0lvcv52y5BZEEw/LU2B1JyCBIg1qtWDN0vEwkzfb5qEVTdhYs+jqBJP6v4XolvXJkJVGvoDk0fuYR5sAxFIZzuKUnBFch4PyNr0VC7prjapjFOQxNxDK6LWlgYBnI/1dAWdOwOAusPzDcCt76yc7V4hVpPucM1jiTbS4dT6k+0mby22fO47aQ4cyPxY=
