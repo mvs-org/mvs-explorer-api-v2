@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import { BlockSchema } from '../models/block.model';
 import { Request, Response } from 'express';
+import { ResponseSuccess, ResponseError } from './../helpers/message.helper'
 
 const Block = mongoose.model('Block', BlockSchema);
 
@@ -19,10 +20,10 @@ export class BlockController {
       })
       .limit(20)
       .then((result) => {
-        res.json(result);
+        res.json(new ResponseSuccess(result));
       }).catch((err) => {
         console.error(err)
-        res.send(err);
+        res.status(400).json(new ResponseError("ERR_LIST_BLOCKS"));
       })
   }
 

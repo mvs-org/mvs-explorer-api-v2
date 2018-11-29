@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import { TransactionSchema } from '../models/transaction.model';
 import { Request, Response } from 'express';
+import { ResponseSuccess, ResponseError } from './../helpers/message.helper'
 
 const Transaction = mongoose.model('Tx', TransactionSchema);
 
@@ -13,10 +14,10 @@ export class TransactionController {
       .sort({height: -1})
       .limit(20)
       .then((result) => {
-        res.json(result);
+        res.json(new ResponseSuccess(result));
       }).catch((err) => {
         console.error(err)
-        res.send(err);
+        res.status(400).json(new ResponseError("ERR_LIST_TRANSACTIONS"));
       })
   }
 

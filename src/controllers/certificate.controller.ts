@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import { OutputSchema } from '../models/output.model';
 import { Request, Response } from 'express';
+import { ResponseSuccess, ResponseError } from './../helpers/message.helper'
 
 const Output = mongoose.model('Output', OutputSchema);
 
@@ -21,10 +22,10 @@ export class CertificateController {
       })
       .limit(20)
       .then((result) => {
-        res.json(result);
+        res.json(new ResponseSuccess(result));
       }).catch((err) => {
         console.error(err)
-        res.send(err);
+        res.status(400).json(new ResponseError("ERR_LIST_CERTIFICATES"));
       })
   }
 
