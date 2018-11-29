@@ -10,6 +10,7 @@ export class TransactionController {
   public getTransactions(req: Request, res: Response) {
 
     const last_known = req.query.last_known
+    let output = {}
     output['rawtx'] = (req.query.raw) ? 1 : 0
     Transaction.find({ ...( last_known && {_id: { $lt: last_known }}), orphan: 0 },output)
       .sort({height: -1})
