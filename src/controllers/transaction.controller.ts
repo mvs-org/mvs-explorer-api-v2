@@ -13,14 +13,23 @@ export class TransactionController {
     const min_time = req.query.min_time
     const max_time = req.query.max_time
 
+
+    let query = { orphan: 0 }
+
+    if (last_known)
+      query['_id'] = { $lt: last_known }
+    if (min_time || max_time) {
+      query['confirmed_at'] = {}
+      if (min_time)
+        query.confirmed_at['$gte'] = min_time
+      if (max_time)
+        query.confirmed_at['$lte'] = max_time
+    }
+
+
     let output = {}
     output['rawtx'] = (req.query.raw) ? 1 : 0
-    Transaction.find({
-      ...(last_known && { _id: { $lt: last_known } }),
-      ...(min_time  && { confirmed_at: { $gte: min_time  } }),
-      ...(max_time && { confirmed_at: { $lte: max_time } }),
-      orphan: 0
-    }, output)
+    Transaction.find(query, output)
       .sort({ height: -1 })
       .limit(20)
       .then((result) => {
