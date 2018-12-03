@@ -14,7 +14,7 @@ export class TransactionController {
     const max_time = req.query.max_time
 
 
-    let query = { orphan: 0 }
+    let query : any = { orphan: 0 }
 
     if (last_known)
       query['_id'] = { $lt: last_known }
