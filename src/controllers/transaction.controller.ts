@@ -17,8 +17,8 @@ export class TransactionController {
     output['rawtx'] = (req.query.raw) ? 1 : 0
     Transaction.find({
       ...(last_known && { _id: { $lt: last_known } }),
-      ...(from_date && { _confirmed_at: { $gte: from_date } }),
-      ...(to_date && { _confirmed_at: { $lte: to_date } }),
+      ...(from_date && { confirmed_at: { $gte: from_date } }),
+      ...(to_date && { confirmed_at: { $lte: to_date } }),
       orphan: 0
     }, output)
       .sort({ height: -1 })
