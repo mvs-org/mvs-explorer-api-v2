@@ -14,7 +14,7 @@ export class TransactionController {
     const max_time = req.query.max_time
 
 
-    let query : any = { orphan: 0 }
+    let query: any = { orphan: 0 }
 
     if (last_known)
       query['_id'] = { $lt: last_known }
@@ -27,8 +27,13 @@ export class TransactionController {
     }
 
 
-    let output = {}
+    let output : any = {
+      "inputs": {
+        "$slice": 6
+      }
+    }
     output['rawtx'] = (req.query.raw) ? 1 : 0
+
     Transaction.find(query, output)
       .sort({ height: -1 })
       .limit(20)
