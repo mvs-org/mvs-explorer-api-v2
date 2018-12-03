@@ -10,15 +10,15 @@ export class TransactionController {
   public getTransactions(req: Request, res: Response) {
 
     const last_known = req.query.last_known
-    const from_date = req.query.from_date
-    const to_date = req.query.to_date
+    const min_time = req.query.min_time
+    const max_time = req.query.max_time
 
     let output = {}
     output['rawtx'] = (req.query.raw) ? 1 : 0
     Transaction.find({
       ...(last_known && { _id: { $lt: last_known } }),
-      ...(from_date && { confirmed_at: { $gte: from_date } }),
-      ...(to_date && { confirmed_at: { $lte: to_date } }),
+      ...(min_time  && { confirmed_at: { $gte: min_time  } }),
+      ...(max_time && { confirmed_at: { $lte: max_time } }),
       orphan: 0
     }, output)
       .sort({ height: -1 })
