@@ -7,6 +7,19 @@ const Avatar = mongoose.model('Avatar', AvatarSchema);
 
 export class AvatarController {
 
+  public info(req: Request, res: Response) {
+    Avatar.find({})
+      .count()
+      .then((count: number) => {
+        res.json(new ResponseSuccess({
+          count: count
+        }));
+      }).catch((err: Error) => {
+        console.error(err)
+        res.status(400).json(new ResponseError("ERR_AVATAR_INFO"));
+      })
+  }
+
   public getAvatars(req: Request, res: Response) {
 
     const sort_by = req.query.sort_by
