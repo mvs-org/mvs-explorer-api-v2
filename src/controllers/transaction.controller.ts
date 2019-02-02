@@ -12,7 +12,7 @@ export class TransactionController {
     const last_known = req.query.last_known
     const min_time = req.query.min_time
     const max_time = req.query.max_time
-
+    const address = req.query.address
 
     let query: any = { orphan: 0 }
 
@@ -26,8 +26,17 @@ export class TransactionController {
         query.confirmed_at['$lte'] = max_time
     }
 
+    if (address) {
+      query.$or = [{
+        'inputs.address': address
+      },
+      {
+        'outputs.address': address
+      }]
+    }
 
-    let output : any = {
+
+    let output: any = {
       "inputs": {
         "$slice": 6
       }
