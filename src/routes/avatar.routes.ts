@@ -7,6 +7,6 @@ export class AvatarRoutes {
 
   public routes(app: Application): void {
     app.route('/avatars').get(this.avatarController.getAvatars)
-    app.route('/avatar/info').get(this.avatarController.info)
+    app.route('/info/avatar').get(this.avatarController.info)
   }
 }
