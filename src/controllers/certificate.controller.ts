@@ -11,7 +11,6 @@ export class CertificateController {
     Output.find({
       ['attachment.type']: "asset-cert",
       orphaned_at: 0,
-      spent_tx: 0,
     })
       .count()
       .then((count: number) => {
@@ -32,7 +31,6 @@ export class CertificateController {
       ...(last_known && { _id: { $lt: last_known } }),
       ['attachment.type']: "asset-cert",
       orphaned_at: 0,
-      spent_tx: 0,
     })
       .sort({
         ...(sort_by == "symbol" && { ['attachment.symbol']: 1 }),
