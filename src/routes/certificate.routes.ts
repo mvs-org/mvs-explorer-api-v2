@@ -1,6 +1,6 @@
 import { CertificateController } from '../controllers/certificate.controller'
 
-import * as options from 'apicache'
+import { options } from 'apicache'
 import { createClient } from 'redis'
 import { config as redis_config, enabled as redis_enabled } from '../config/redis.js'
 import { Application } from 'express';
