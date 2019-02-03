@@ -3,6 +3,7 @@ import { OutputSchema } from '../models/output.model';
 import { Request, Response } from 'express';
 import { ResponseSuccess, ResponseError } from './../helpers/message.helper'
 
+
 const Output = mongoose.model('Output', OutputSchema);
 
 export class CertificateController {
