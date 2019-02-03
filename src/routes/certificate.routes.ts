@@ -7,5 +7,6 @@ export class CertificateRoutes {
 
   public routes(app): void {
     app.route('/certs').get(this.certificateController.getCertificates)
+    app.route('/info/cert').get(this.certificateController.info)
   }
 }

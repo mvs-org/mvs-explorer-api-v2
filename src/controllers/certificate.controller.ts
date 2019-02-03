@@ -7,6 +7,22 @@ const Output = mongoose.model('Output', OutputSchema);
 
 export class CertificateController {
 
+  public info(req: Request, res: Response) {
+    Output.find({
+      ['attachment.type']: "asset-cert",
+      orphaned_at: 0,
+    })
+      .count()
+      .then((count: number) => {
+        res.json(new ResponseSuccess({
+          count: count
+        }));
+      }).catch((err: Error) => {
+        console.error(err)
+        res.status(400).json(new ResponseError("ERR_LIST_MIT"));
+      })
+  }
+
   public getCertificates(req: Request, res: Response) {
 
     const sort_by = req.query.sort_by
