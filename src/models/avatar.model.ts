@@ -1,26 +1,26 @@
-import * as mongoose from 'mongoose';
+import * as mongoose from 'mongoose'
 
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema
 
 export const AvatarUpdateSchema = new Schema({
   address: String,
+  confirmed_at: Number,
+  height: Number,
+  issue_index: Number,
+  issue_tx: String,
   symbol: String,
   type: String,
-  issue_tx: String,
-  issue_index: Number,
-  height: Number,
-  confirmed_at: Number
 })
 
 export const AvatarSchema = new Schema({
-  id: Schema.Types.ObjectId,
   address: String,
-  symbol: String,
-  ['type']: String,
-  issue_tx: String,
-  issue_index: Number,
+  confirmed_at: Number,
   height: Number,
+  id: Schema.Types.ObjectId,
+  issue_index: Number,
+  issue_tx: String,
+  ['type']: String,
   original_address: String,
+  symbol: String,
   updates: [AvatarUpdateSchema],
-  confirmed_at: Number
 }, { collection: 'avatar' })
