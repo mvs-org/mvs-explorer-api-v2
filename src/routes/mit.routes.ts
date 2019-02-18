@@ -1,10 +1,10 @@
-import { Application } from "express"
+import { Application } from 'express'
 import { MITController } from '../controllers/mit.controller'
 import { mediumCacheSuccess } from '../helpers/cache.helper'
 
 export class MITRoutes {
 
-  public mitController : MITController =  new MITController()
+  public mitController: MITController =  new MITController()
 
   public routes(app: Application): void {
     app.route('/mits').get(mediumCacheSuccess, this.mitController.getMITs)

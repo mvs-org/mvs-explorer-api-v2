@@ -1,25 +1,25 @@
-import * as mongoose from 'mongoose';
-import { OutputSchema } from '../models/output.model';
-import { Request, Response } from 'express';
-import { ResponseSuccess, ResponseError } from './../helpers/message.helper'
+import { Request, Response } from 'express'
+import * as mongoose from 'mongoose'
+import { OutputSchema } from '../models/output.model'
+import { ResponseError, ResponseSuccess  } from './../helpers/message.helper'
 
-const Output = mongoose.model('Output', OutputSchema);
+const Output = mongoose.model('Output', OutputSchema)
 
 export class MITController {
 
   public info(req: Request, res: Response) {
     Output.find({
-      ['attachment.type']: "mit",
+      ['attachment.type']: 'mit',
       orphaned_at: 0,
     })
       .count()
       .then((count: number) => {
         res.json(new ResponseSuccess({
-          count: count
-        }));
+          count,
+        }))
       }).catch((err: Error) => {
         console.error(err)
-        res.status(400).json(new ResponseError("ERR_LIST_MIT"));
+        res.status(400).json(new ResponseError('ERR_LIST_MIT'))
       })
   }
 
@@ -29,19 +29,19 @@ export class MITController {
     const last_known = req.query.last_known
     Output.find({
       ...(last_known && { _id: { $lt: last_known } }),
-      ['attachment.type']: "mit",
+      ['attachment.type']: 'mit',
       orphaned_at: 0,
     })
       .sort({
-        ...(sort_by == "symbol" && { ['attachment.symbol']: 1 }),
-        ...(sort_by !== "symbol" && { height: -1 })
+        ...(sort_by === 'symbol' && { ['attachment.symbol']: 1 }),
+        ...(sort_by !== 'symbol' && { height: -1 }),
       })
       .limit(20)
       .then((result) => {
-        res.json(new ResponseSuccess(result));
+        res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)
-        res.status(400).json(new ResponseError("ERR_LIST_MIT"));
+        res.status(400).json(new ResponseError('ERR_LIST_MIT'))
       })
   }
 
