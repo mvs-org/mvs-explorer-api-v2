@@ -1,5 +1,5 @@
-import { CertificateController } from '../controllers/certificate.controller'
 import { Application } from 'express'
+import { CertificateController } from '../controllers/certificate.controller'
 import { longCacheSuccess } from '../helpers/cache.helper'
 
 export class CertificateRoutes {
