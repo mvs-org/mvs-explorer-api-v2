@@ -1,9 +1,9 @@
-import * as mongoose from 'mongoose';
-import { TransactionSchema } from '../models/transaction.model';
-import { Request, Response } from 'express';
-import { ResponseSuccess, ResponseError } from './../helpers/message.helper'
+import { Request, Response } from 'express'
+import * as mongoose from 'mongoose'
+import { TransactionSchema } from '../models/transaction.model'
+import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 
-const Transaction = mongoose.model('Tx', TransactionSchema);
+const Transaction = mongoose.model('Tx', TransactionSchema)
 
 export class TransactionController {
 
@@ -14,45 +14,44 @@ export class TransactionController {
     const max_time = req.query.max_time
     const address = req.query.address
 
-    let query: any = { orphan: 0 }
+    const query: any = { orphan: 0 }
 
-    if (last_known)
-      query['_id'] = { $lt: last_known }
+    if (last_known) {
+      query._id = { $lt: last_known }
+    }
     if (min_time || max_time) {
-      query['confirmed_at'] = {}
-      if (min_time)
-        query.confirmed_at['$gte'] = min_time
-      if (max_time)
-        query.confirmed_at['$lte'] = max_time
+      query.confirmed_at = {}
+      if (min_time) {
+        query.confirmed_at.$gte = min_time
+      }
+      if (max_time) {
+        query.confirmed_at.$lte = max_time
+      }
     }
 
     if (address) {
       query.$or = [{
-        'inputs.address': address
+        'inputs.address': address,
       },
       {
-        'outputs.address': address
+        'outputs.address': address,
       }]
     }
 
-
-    let output: any = {
-      "inputs": {
-        "$slice": 6
-      }
+    const output = {
+      inputs: {
+        $slice: 6,
+      },
+      rawtx: (req.query.raw) ? 1 : 0,
     }
-    output['rawtx'] = (req.query.raw) ? 1 : 0
-
     Transaction.find(query, output)
       .sort({ height: -1 })
       .limit(20)
       .then((result) => {
-        res.json(new ResponseSuccess(result));
+        res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)
-        res.status(400).json(new ResponseError("ERR_LIST_TRANSACTIONS"));
+        res.status(400).json(new ResponseError('ERR_LIST_TRANSACTIONS'))
       })
   }
-
 }
-

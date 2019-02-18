@@ -1,51 +1,51 @@
-import * as mongoose from 'mongoose';
+import * as mongoose from 'mongoose'
 
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema
+
+export const PreviousOutputSchema = new Schema ({
+    hash: String,
+    index: Number,
+})
 
 export const InputSchema = new Schema({
-  previous_output: {
-    hash: String,
-    index: Number
-  },
+  address: String,
+  attachment: Map,
+  index: Number,
+  previous_output: PreviousOutputSchema,
   script: String,
   sequence: Number,
-  index: Number,
-  attachment: Map,
-  address: String,
-  value: Number
+  value: Number,
 })
 
 export const OutputSchema = new Schema({
+  _id: Schema.Types.ObjectId,
   address: String,
   attachment: Map,
+  confirmed_at: Number,
+  height: Number,
   index: Number,
   locked_height_range: Number,
-  script: String,
-  value: Number,
-  tx: String,
   orphaned_at: Number,
-  height: Number,
+  script: String,
   spent_tx: String,
-  confirmed_at: Number,
-  _id: Schema.Types.ObjectId
+  tx: String,
+  value: Number,
 })
 
 export const TransactionSchema = new Schema({
-  id: Schema.Types.ObjectId,
-  hash: {
-    type: String,
-    required: 'Transaction muse have a hash',
-    lowercase: true
-  },
-  inputs: [InputSchema],
-  lock_time: String,
-  outputs: [OutputSchema],
-  version: String,
-  height: Number,
-  orphan: Number,
   block: String,
   confirmed_at: Number,
-  rawtx: String
+  hash: {
+    lowercase: true,
+    required: 'Transaction muse have a hash',
+    type: String,
+  },
+  height: Number,
+  id: Schema.Types.ObjectId,
+  inputs: [InputSchema],
+  lock_time: String,
+  orphan: Number,
+  outputs: [OutputSchema],
+  rawtx: String,
+  version: String,
 }, { collection: 'tx' })
-
-
