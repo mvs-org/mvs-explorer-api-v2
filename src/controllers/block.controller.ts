@@ -1,9 +1,9 @@
-import * as mongoose from 'mongoose';
-import { BlockSchema } from '../models/block.model';
-import { Request, Response } from 'express';
-import { ResponseSuccess, ResponseError } from './../helpers/message.helper'
+import { Request, Response } from 'express'
+import * as mongoose from 'mongoose'
+import { BlockSchema } from '../models/block.model'
+import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 
-const Block = mongoose.model('Block', BlockSchema);
+const Block = mongoose.model('Block', BlockSchema)
 
 export class BlockController {
 
@@ -13,17 +13,17 @@ export class BlockController {
     const last_known = req.query.last_known
     Block.find({
       ...(last_known && { _id: { $lt: last_known } }),
-      orphan: 0
+      orphan: 0,
     })
       .sort({
-        ['number']: -1
+        ['number']: -1,
       })
       .limit(20)
       .then((result) => {
-        res.json(new ResponseSuccess(result));
+        res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)
-        res.status(400).json(new ResponseError("ERR_LIST_BLOCKS"));
+        res.status(400).json(new ResponseError('ERR_LIST_BLOCKS'))
       })
   }
 
