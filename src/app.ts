@@ -1,11 +1,11 @@
-import * as express from "express"
-import * as bodyParser from "body-parser"
-import { TransactionRoutes } from "./routes/transaction.routes"
-import { AvatarRoutes } from "./routes/avatar.routes"
-import { CertificateRoutes } from "./routes/certificate.routes"
-import { MITRoutes } from "./routes/mit.routes"
-import { BlockRoutes } from "./routes/block.routes"
-import * as mongoose from "mongoose"
+import * as bodyParser from 'body-parser'
+import * as express from 'express'
+import * as mongoose from 'mongoose'
+import { AvatarRoutes } from './routes/avatar.routes'
+import { BlockRoutes } from './routes/block.routes'
+import { CertificateRoutes } from './routes/certificate.routes'
+import { MITRoutes } from './routes/mit.routes'
+import { TransactionRoutes } from './routes/transaction.routes'
 
 class App {
 
@@ -31,18 +31,17 @@ class App {
   private config(): void {
     // support application/json type post data
     this.app.use(bodyParser.json())
-    //support application/x-www-form-urlencoded post data
+    // support application/x-www-form-urlencoded post data
     this.app.use(bodyParser.urlencoded({ extended: false }))
     this.app.all('/*', (req, res, next) => {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      res.header('Content-Type', 'application/json');
-      next();
-    });
+      res.header('Access-Control-Allow-Origin', '*')
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+      res.header('Content-Type', 'application/json')
+      next()
+    })
   }
 
   private mongoSetup(): void {
-    mongoose.Promise = global.Promise
     mongoose.connect(this.mongoUrl, { useNewUrlParser: true })
   }
 

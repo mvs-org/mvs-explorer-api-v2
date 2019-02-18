@@ -1,30 +1,30 @@
-export class ResponseMessage{
+export class ResponseMessage {
   public status: {
     success: number,
-    message?: string
+    message?: string,
   }
   public result: any
   constructor(
     success: number,
     data?: any,
-    message?: string
-  ){
+    message?: string,
+  ) {
     this.status = {
-      success: success,
-      message: message
+      message,
+      success,
     }
-    this.result=data
+    this.result = data
   }
 }
 
-export class ResponseSuccess extends ResponseMessage{
-  constructor(data: any, message?: string){
+export class ResponseSuccess extends ResponseMessage {
+  constructor(data: any, message?: string) {
     super(1, data, message)
   }
 }
 
-export class ResponseError extends ResponseMessage{
-  constructor(message?: string){
+export class ResponseError extends ResponseMessage {
+  constructor(message?: string) {
     super(0, undefined, message)
   }
 }
