@@ -1,0 +1,39 @@
+version: '2'
+
+services:
+    redis:
+        image: redis
+    mongodb:
+        image: library/mongo
+    mvsd:
+        image: cangr/mvsd
+    sync:
+        image: cangr/mvsd-mongo-sync:dev
+        environment:
+          - MONGO_HOST=mongodb
+          - MVSD_HOST=mvsd
+        links:
+          - mongodb
+          - mvsd
+        depends_on:
+          - mvsd
+          - mongodb
+    api:
+        image: cangr/mvs-explorer-api
+        environment:
+          - MONGO_HOST=mongodb
+          - REDIS_HOST=redis
+        links:
+          - redis
+          - mongodb
+        ports:
+          - 81:80
+    api-v2:
+        build: ..                                    
+        restart: always
+        environment:
+          - REDIS_HOST=redis
+          - MONGO_URL=mongodb://mongodb/metaverse
+        ports:
+          - 82:80
+    
