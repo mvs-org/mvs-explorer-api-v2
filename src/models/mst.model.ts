@@ -13,7 +13,7 @@ export const MSTSchema = new Schema({
   issue_index: Number,
   issue_tx: String,
   issuer : String,
-  original_quantity: Number,                                  
+  original_quantity: Number,
   quantity: Number,
   secondaryissue_threshold: Number,
   symbol: String,

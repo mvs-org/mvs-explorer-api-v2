@@ -8,6 +8,7 @@ export class MSTRoutes {
 
   public routes(app: Application): void {
     app.route('/msts').get(mediumCacheSuccess, this.mstController.getMSTs)
+    app.route('/info/mst').get(mediumCacheSuccess, this.mstController.info)
     app.route('/msts/special').get(longCacheSuccess, this.mstController.getSpecialMSTs)
   }
 

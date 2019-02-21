@@ -9,6 +9,20 @@ export const MST_BLACKLIST = ['ETP']
 export const MST_SPECIAL = ['PARCELX.GPX', 'RIGHTBTC.RT', 'MVS.ZGC', 'MVS.ZDC']
 
 export class MSTController {
+
+  public info(req: Request, res: Response) {
+    Asset.find()
+      .count()
+      .then((count: number) => {
+        res.json(new ResponseSuccess({
+          count,
+        }))
+      }).catch((err: Error) => {
+        console.error(err)
+        res.status(400).json(new ResponseError('ERR_LIST_MIT'))
+      })
+  }
+
   public getSpecialMSTs(req: Request, res: Response) {
     Asset.find({
         symbol: {
