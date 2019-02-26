@@ -14,6 +14,7 @@ export class CertificateController {
     })
       .count()
       .then((count: number) => {
+        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
         res.json(new ResponseSuccess({
           count,
         }))
@@ -38,6 +39,11 @@ export class CertificateController {
       })
       .limit(20)
       .then((result) => {
+        if (last_known) {
+          res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
+        } else {
+          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+        }
         res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)

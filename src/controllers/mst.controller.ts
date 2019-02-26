@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import * as mongoose from 'mongoose'
 import { MSTSchema } from '../models/mst.model'
-import { ResponseError, ResponseSuccess  } from './../helpers/message.helper'
+import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 
 const Asset = mongoose.model('Asset', MSTSchema)
 
@@ -14,6 +14,7 @@ export class MSTController {
     Asset.find()
       .count()
       .then((count: number) => {
+        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
         res.json(new ResponseSuccess({
           count,
         }))
@@ -25,14 +26,15 @@ export class MSTController {
 
   public getSpecialMSTs(req: Request, res: Response) {
     Asset.find({
-        symbol: {
-            $in: MST_SPECIAL,
-        },
+      symbol: {
+        $in: MST_SPECIAL,
+      },
     })
       .sort({
         symbol: 1,
       })
       .then((result) => {
+        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=1800')
         res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)
@@ -43,16 +45,17 @@ export class MSTController {
   public getMSTs(req: Request, res: Response) {
     const lastSymbol = req.query.last_symbol || ''
     Asset.find({
-        symbol: {
-            $gt: lastSymbol,
-            $nin: MST_BLACKLIST.concat(MST_SPECIAL),
-        },
+      symbol: {
+        $gt: lastSymbol,
+        $nin: MST_BLACKLIST.concat(MST_SPECIAL),
+      },
     })
       .sort({
         symbol: 1,
       })
       .limit(20)
       .then((result) => {
+        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
         res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)

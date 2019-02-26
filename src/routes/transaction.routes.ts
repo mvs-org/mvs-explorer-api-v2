@@ -7,7 +7,7 @@ export class TransactionRoutes {
   public transactionController: TransactionController = new TransactionController()
 
   public routes(app: Application): void {
-    app.route('/txs').get(shortCacheSuccess, this.transactionController.getTransactions)
+    app.route('/txs').get(this.transactionController.getTransactions)
   }
 
 }
