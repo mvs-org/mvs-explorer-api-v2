@@ -7,6 +7,7 @@ export const BlockSchema = new Schema({
   hash: String,
   id: Schema.Types.ObjectId,
   merkle_tree_hash: String,
+  mining_model: String,
   mixhash: String,
   nonce: String,
   number: Number,

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import * as mongoose from 'mongoose'
 import { MSTSchema } from '../models/mst.model'
+import { AddressBalances } from '../models/address_balances.model'
 import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 
 const Asset = mongoose.model('Asset', MSTSchema)
@@ -42,8 +43,9 @@ export class MSTController {
       })
   }
 
-  public getMSTs(req: Request, res: Response) {
+  public async getMSTs(req: Request, res: Response) {
     const lastSymbol = req.query.last_symbol || ''
+    const coinbaseBalances = (await AddressBalances.findOne({ _id: 'coinbase' })) || {}
     Asset.find({
       symbol: {
         $gt: lastSymbol,
@@ -54,6 +56,12 @@ export class MSTController {
         symbol: 1,
       })
       .limit(20)
+      .then(result => result.map((mst: mongoose.Document) => {
+        return {
+          minedQuantity: coinbaseBalances[mst.toObject().symbol.replace(/\./g, '_')] || 0,
+          ...mst.toObject(),
+        }
+      }))
       .then((result) => {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
         res.json(new ResponseSuccess(result))

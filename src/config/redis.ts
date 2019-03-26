@@ -1,4 +1,4 @@
-export const enabled = true
+export const enabled = (process.env.REDIS_ENABLED) ? process.env.REDIS_ENABLED == 'true' : true
 export const config = {
         host: (process.env.REDIS_HOST) ? process.env.REDIS_HOST : '127.0.0.1',
         password: undefined,
