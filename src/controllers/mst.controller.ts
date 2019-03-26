@@ -45,7 +45,7 @@ export class MSTController {
 
   public async getMSTs(req: Request, res: Response) {
     const lastSymbol = req.query.last_symbol || ''
-    const coinbaseBalances = (await AddressBalances.findOne({ _id: 'coinbase' })) || {}
+    const coinbaseBalances = (await AddressBalances.findOne({ _id: 'coinbase' })).toObject() || { _id: 'coinbase', value: new Map() }
     Asset.find({
       symbol: {
         $gt: lastSymbol,
@@ -58,7 +58,7 @@ export class MSTController {
       .limit(20)
       .then(result => result.map((mst: mongoose.Document) => {
         return {
-          minedQuantity: coinbaseBalances[mst.toObject().symbol.replace(/\./g, '_')] || 0,
+          minedQuantity: -coinbaseBalances.value.get(mst.toObject().symbol.replace(/\./g, '_')) || 0,
           ...mst.toObject(),
         }
       }))
