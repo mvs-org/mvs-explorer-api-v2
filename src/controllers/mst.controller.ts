@@ -25,7 +25,9 @@ export class MSTController {
       })
   }
 
-  public getSpecialMSTs(req: Request, res: Response) {
+  public async getSpecialMSTs(req: Request, res: Response) {
+    const coinbaseBalances = (await AddressBalances.findOne({ _id: 'coinbase' })).toObject() ||
+      { _id: 'coinbase', value: new Map() }
     Asset.find({
       symbol: {
         $in: MST_SPECIAL,
@@ -34,6 +36,12 @@ export class MSTController {
       .sort({
         symbol: 1,
       })
+      .then((result) => result.map((mst: mongoose.Document) => {
+        return {
+          minedQuantity: -coinbaseBalances.value.get(mst.toObject().symbol.replace(/\./g, '_')) || 0,
+          ...mst.toObject(),
+        }
+      }))
       .then((result) => {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=1800')
         res.json(new ResponseSuccess(result))
@@ -45,7 +53,8 @@ export class MSTController {
 
   public async getMSTs(req: Request, res: Response) {
     const lastSymbol = req.query.last_symbol || ''
-    const coinbaseBalances = (await AddressBalances.findOne({ _id: 'coinbase' })).toObject() || { _id: 'coinbase', value: new Map() }
+    const coinbaseBalances = (await AddressBalances.findOne({ _id: 'coinbase' })).toObject() ||
+      { _id: 'coinbase', value: new Map() }
     Asset.find({
       symbol: {
         $gt: lastSymbol,
@@ -56,7 +65,7 @@ export class MSTController {
         symbol: 1,
       })
       .limit(20)
-      .then(result => result.map((mst: mongoose.Document) => {
+      .then((result) => result.map((mst: mongoose.Document) => {
         return {
           minedQuantity: -coinbaseBalances.value.get(mst.toObject().symbol.replace(/\./g, '_')) || 0,
           ...mst.toObject(),

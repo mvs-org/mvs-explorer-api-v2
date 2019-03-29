@@ -11,7 +11,7 @@ export class AvatarController {
     Avatar.find({})
       .count()
       .then((count: number) => {
-        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
         res.json(new ResponseSuccess({
           count,
         }))
