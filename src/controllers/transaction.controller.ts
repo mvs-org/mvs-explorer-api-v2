@@ -101,7 +101,6 @@ export class TransactionController {
         'outputs.address': addresses,
       }]
       return Transaction.find(query, txFormat)
-        .sort({ height: 1 })
     }
 
     try {
