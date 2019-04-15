@@ -105,15 +105,16 @@ export class TransactionController {
 
     try {
       let txs = await loadAddressesTxs(addresses, last_known_height, NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES + 1)
-      if (txs.length === NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES) {
+      if (txs.length >= NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES + 1) {
         if (txs[txs.length - 1].toObject().height === txs[txs.length - 2].toObject().height) {
           const lastHeight = txs[txs.length - 1].toObject().height
           const nextTxChunk = await loadAllAddressesTxsOfBlock(addresses, lastHeight)
           txs = txs.filter((tx: any) => tx.height !== lastHeight).concat(nextTxChunk)
         }
-      } else {
-        txs.pop()
-      }
+        else {
+          txs.pop()
+        }
+      } 
       if (last_known_height > 0) {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
       } else {
