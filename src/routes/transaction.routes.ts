@@ -8,6 +8,7 @@ export class TransactionRoutes {
 
   public routes(app: Application): void {
     app.route('/txs').get(this.transactionController.getTransactions)
+    app.route('/addresses/txs').get(this.transactionController.getAddressesTransactions)
   }
 
 }

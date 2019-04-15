@@ -59,4 +59,69 @@ export class TransactionController {
         res.status(400).json(new ResponseError('ERR_LIST_TRANSACTIONS'))
       })
   }
+
+  public async getAddressesTransactions(req: Request, res: Response) {
+
+    let last_known_height = req.query.min_height || 0
+    const addresses = req.query.addresses
+    const NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES = 5
+
+    const txFormat = {
+      _id: 0,
+      confirmed_at: 1,
+      hash: 1,
+      height: 1,
+      inputs: 1,
+      outputs: 1,
+    }
+
+    async function loadAddressesTxs(addresses: string[], last_known_height: number, limit: number) {
+      const query: any = { orphan: 0 }
+      if (last_known_height) {
+        query.height = { $gte: last_known_height }
+      }
+      query.$or = [{
+        'inputs.address': addresses,
+      },
+      {
+        'outputs.address': addresses,
+      }]
+      return Transaction.find(query, txFormat)
+        .sort({ height: 1 })
+        .limit(limit)
+    }
+
+    async function loadAllAddressesTxsOfBlock(addresses: string[], block: number) {
+      const query: any = { orphan: 0 }
+      query.height = block
+      query.$or = [{
+        'inputs.address': addresses,
+      },
+      {
+        'outputs.address': addresses,
+      }]
+      return Transaction.find(query, txFormat)
+        .sort({ height: 1 })
+    }
+
+    try {
+      let txs = await loadAddressesTxs(addresses, last_known_height, NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES)
+      if (txs.length === NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES) {
+        if (txs[txs.length - 1].toObject().height === txs[txs.length - 2].toObject().height) {
+          const lastHeight = txs[txs.length - 1].toObject().height
+          const nextTxChunk = await loadAllAddressesTxsOfBlock(addresses, lastHeight)
+          txs = txs.filter((tx: any) => tx.height !== lastHeight).concat(nextTxChunk)
+        }
+      }
+      if (last_known_height > 0) {
+        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+      }
+      res.json(new ResponseSuccess(txs.reverse()))
+    } catch (err) {
+      console.error(err)
+      res.status(400).json(new ResponseError('ERR_LIST_TRANSACTIONS'))
+    }
+  }
 }
