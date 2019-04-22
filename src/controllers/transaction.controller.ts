@@ -64,7 +64,10 @@ export class TransactionController {
 
     let last_known_height = req.query.min_height || 0
     const addresses = req.query.addresses
-    const NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES = 5
+    const NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES =
+      process.env.NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES
+        ? parseInt(process.env.NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES, 10)
+        : 5
 
     const txFormat = {
       _id: 0,
@@ -114,7 +117,7 @@ export class TransactionController {
         else {
           txs.pop()
         }
-      } 
+      }
       if (last_known_height > 0) {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
       } else {
