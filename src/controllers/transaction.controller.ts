@@ -121,11 +121,6 @@ export class TransactionController {
           txs.pop()
         }
       }
-      if (last_known_height > 0) {
-        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
-      } else {
-        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
-      }
       res.json(new ResponseSuccess(txs.reverse()))
     } catch (err) {
       console.error(err)
