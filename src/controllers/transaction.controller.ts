@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import * as mongoose from 'mongoose'
+import { isArray } from 'util';
 import { TransactionSchema } from '../models/transaction.model'
 import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 
@@ -62,7 +63,7 @@ export class TransactionController {
 
   public async getAddressesTransactions(req: Request, res: Response) {
 
-    let last_known_height = req.query.min_height || 0
+    const last_known_height = req.query.min_height || 0
     const addresses = req.query.addresses
     const NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES =
       process.env.NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES
@@ -107,14 +108,16 @@ export class TransactionController {
     }
 
     try {
+      if (!isArray(addresses) || addresses.length === 0) {
+        throw Error('ERR_ADDRESSES_UNDEFINED')
+      }
       let txs = await loadAddressesTxs(addresses, last_known_height, NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES + 1)
       if (txs.length >= NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES + 1) {
         if (txs[txs.length - 1].toObject().height === txs[txs.length - 2].toObject().height) {
           const lastHeight = txs[txs.length - 1].toObject().height
           const nextTxChunk = await loadAllAddressesTxsOfBlock(addresses, lastHeight)
           txs = txs.filter((tx: any) => tx.height !== lastHeight).concat(nextTxChunk)
-        }
-        else {
+        } else {
           txs.pop()
         }
       }
