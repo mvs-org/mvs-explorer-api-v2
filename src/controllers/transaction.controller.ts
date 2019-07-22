@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import * as mongoose from 'mongoose'
-import { isArray } from 'util';
+import { isArray } from 'util'
 import { TransactionSchema } from '../models/transaction.model'
 import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 
