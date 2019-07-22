@@ -12,7 +12,7 @@ export const OutputSchema = new Schema({
   locked_height_range: Number,
   orphaned_at: Number,
   script: String,
-  spent_tx: String,
+  spent_tx: Schema.Types.Mixed,
   tx: String,
   value: Number,
 }, {collection: 'output'})
