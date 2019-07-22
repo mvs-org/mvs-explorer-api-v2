@@ -24,11 +24,14 @@ export class OutputController {
 
     query.value = { $gt: 10000 }
     query['attachment.type'] = 'etp'
+    query.locked_height_range = 0
 
     const outputFormat = {
       _id: 0,
+      attachment: 1,
       index: 1,
       tx: 1,
+      value: 1,
     }
 
     Output.findOne(query, outputFormat)
