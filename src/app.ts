@@ -8,6 +8,7 @@ import { MITRoutes } from './routes/mit.routes'
 import { MSTRoutes } from './routes/mst.routes'
 import { OutputRoutes } from './routes/output.routes'
 import { TransactionRoutes } from './routes/transaction.routes'
+import { AddressRoutes } from './routes/address.routes';
 
 class App {
 
@@ -15,6 +16,7 @@ class App {
   public transactionRoutes: TransactionRoutes = new TransactionRoutes()
   public OutputRoutes: OutputRoutes = new OutputRoutes()
   public avatarRoutes: AvatarRoutes = new AvatarRoutes()
+  public addressRoutes: AddressRoutes = new AddressRoutes()
   public mitRoutes: MITRoutes = new MITRoutes()
   public mstRoutes: MSTRoutes = new MSTRoutes()
   public blockRoutes: BlockRoutes = new BlockRoutes()
@@ -27,6 +29,7 @@ class App {
     this.transactionRoutes.routes(this.app)
     this.OutputRoutes.routes(this.app)
     this.avatarRoutes.routes(this.app)
+    this.addressRoutes.routes(this.app)
     this.mitRoutes.routes(this.app)
     this.mstRoutes.routes(this.app)
     this.blockRoutes.routes(this.app)
