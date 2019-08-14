@@ -7,7 +7,7 @@ import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 const Asset = mongoose.model('Asset', MSTSchema)
 
 export const MST_BLACKLIST = ['ETP']
-export const MST_SPECIAL = ['PARCELX.GPX', 'RIGHTBTC.RT', 'MVS.ZGC', 'MVS.ZDC']
+export const MST_SPECIAL = ['DNA', 'MVS.ZGC', 'MVS.ZDC']
 
 export class MSTController {
 
