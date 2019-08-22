@@ -28,10 +28,12 @@ export class MITController {
 
     const sort_by = req.query.sort_by
     const last_known = req.query.last_known
+    const address = req.query.address
     Output.find({
       ...(last_known && { _id: { $lt: last_known } }),
+      ...(address && { ['address']: address}),
       ['attachment.type']: 'mit',
-      orphaned_at: 0,
+      spent_tx: 0,
     })
       .sort({
         ...(sort_by === 'symbol' && { ['attachment.symbol']: 1 }),
