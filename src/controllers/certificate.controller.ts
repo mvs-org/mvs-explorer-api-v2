@@ -54,7 +54,7 @@ export class CertificateController {
   public getCertificate(req: Request, res: Response) {
 
     const type = req.query.type || undefined
-    const symbol = req.query.symbol
+    const symbol = req.query.symbol.toUpperCase()
     Output.find({
       ...(type && { ['attachment.cert']: type}),
       ['attachment.type']: 'asset-cert',
