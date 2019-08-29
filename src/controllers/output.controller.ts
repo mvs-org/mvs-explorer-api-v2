@@ -28,7 +28,7 @@ export class OutputController {
 
     const sortOptions: IUtxoSortOption = {}
     try {
-      ok(limit > 0, 'ERR_INVALID_LIMIT')
+      ok(limit >= 0, 'ERR_INVALID_LIMIT')
       ok(limit <= UTXO_LIMIT_COUNT_MAX, 'ERR_INVALID_LIMIT')
       ok(addresses, 'ERR_ADDRESSES_UNDEFINED')
       switch (sort) {
