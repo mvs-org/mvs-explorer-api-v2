@@ -20,7 +20,7 @@ export class CertificateController {
         }))
       }).catch((err: Error) => {
         console.error(err)
-        res.status(400).json(new ResponseError('ERR_LIST_MIT'))
+        res.status(400).json(new ResponseError('ERR_INFO_CERT'))
       })
   }
 
@@ -48,6 +48,27 @@ export class CertificateController {
       }).catch((err) => {
         console.error(err)
         res.status(400).json(new ResponseError('ERR_LIST_CERTIFICATES'))
+      })
+  }
+
+  public getCertificate(req: Request, res: Response) {
+
+    const type = req.query.type || undefined
+    const symbol = req.query.symbol.toUpperCase()
+    Output.find({
+      ...(type && { ['attachment.cert']: type}),
+      ['attachment.type']: 'asset-cert',
+      ['attachment.symbol']: symbol,
+      orphaned_at: 0,
+    })
+      .then((result) => {
+        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
+        res.json(new ResponseSuccess({
+          result
+        }))
+      }).catch((err: Error) => {
+        console.error(err)
+        res.status(400).json(new ResponseError('ERR_GET_CERT'))
       })
   }
 
