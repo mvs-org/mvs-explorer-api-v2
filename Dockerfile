@@ -1,10 +1,10 @@
-FROM library/node:11.2-alpine
+FROM library/node:10-alpine
 RUN npm i -g  typescript ts-node
 WORKDIR /work
 COPY . .
 RUN npm i && tsc
 
-FROM library/node:11.2-alpine  
+FROM library/node:10-alpine  
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=0 /work/dist ./dist
