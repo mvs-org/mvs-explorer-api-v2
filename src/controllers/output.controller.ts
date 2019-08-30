@@ -40,14 +40,14 @@ export class OutputController {
       if (output == null) {
         throw Error('ERR_OUTPUT_NOT_FOUND')
       }
-      res.json(output)
+      res.json(newResponseSuccess(output))
     } catch (error) {
       switch (error.message) {
         case 'ERR_OUTPUT_NOT_FOUND':
-          return res.status(404).send(error.message)
+          return res.status(404).send(new ResponseError(error.message))
       }
       console.error(error)
-      return res.status(500).send('ERR_INTERNAL_SERVER_ERROR')
+      return res.status(500).send(new ResponseError('ERR_INTERNAL_SERVER_ERROR'))
     }
   }
 
