@@ -12,12 +12,44 @@ const UTXO_SORT_DEFAULT = process.env.UTXO_SORT_DEFAULT ? process.env.UTXO_SORT_
 
 const Output = mongoose.model('Output', OutputSchema)
 
+const outputFormat = {
+  _id: 0,
+  address: 1,
+  attachment: 1,
+  height: 1,
+  index: 1,
+  locked_height_range: 1,
+  script: 1,
+  tx: 1,
+  value: 1,
+}
+
 export interface IUtxoSortOption {
   height?: 1 | -1
   value?: 1 | -1
 }
 
 export class OutputController {
+
+  public async getOutput(req: Request, res: Response) {
+
+    const txid = req.params.txid
+    const index = parseInt(req.params.index, 10)
+    try {
+      const output = await Output.findOne({ tx: txid, index }, outputFormat)
+      if (output == null) {
+        throw Error('ERR_OUTPUT_NOT_FOUND')
+      }
+      res.json(output)
+    } catch (error) {
+      switch (error.message) {
+        case 'ERR_OUTPUT_NOT_FOUND':
+          return res.status(404).send(error.message)
+      }
+      console.error(error)
+      return res.status(500).send('ERR_INTERNAL_SERVER_ERROR')
+    }
+  }
 
   public getUtxo(req: Request, res: Response) {
     const addresses = req.query.addresses
@@ -65,18 +97,6 @@ export class OutputController {
 
     if (maxHeight > 0) {
       query.height = { $gt: maxHeight }
-    }
-
-    const outputFormat = {
-      _id: 0,
-      address: 1,
-      attachment: 1,
-      height: 1,
-      index: 1,
-      locked_height_range: 1,
-      script: 1,
-      tx: 1,
-      value: 1,
     }
 
     Output.find(query, outputFormat)

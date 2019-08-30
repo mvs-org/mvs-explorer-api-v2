@@ -8,6 +8,7 @@ export class OutputRoutes {
 
   public routes(app: Application): void {
     app.route('/utxo').get(this.outputController.getUtxo)
+    app.route('/output/:txid/:index').get(this.outputController.getOutput)
   }
 
 }
