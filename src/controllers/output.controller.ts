@@ -40,7 +40,7 @@ export class OutputController {
       if (output == null) {
         throw Error('ERR_OUTPUT_NOT_FOUND')
       }
-      res.json(newResponseSuccess(output))
+      res.json(new ResponseSuccess(output))
     } catch (error) {
       switch (error.message) {
         case 'ERR_OUTPUT_NOT_FOUND':
