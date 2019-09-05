@@ -44,4 +44,21 @@ export class AvatarController {
       })
   }
 
+  public getAvatarAvailability(req: Request, res: Response) {
+
+    const symbol = req.params.symbol
+    const regex = new RegExp(`^${symbol}$`, "i");
+
+    Avatar.findOne({
+      symbol: regex,
+    })
+    .then((result) => {
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+      res.json(new ResponseSuccess(result == null ? true : false))
+    }).catch((err) => {
+      console.error(err)
+      res.status(400).json(new ResponseError('ERR_GET_AVATAR_AVAILABILITY'))
+    })
+  }
+
 }
