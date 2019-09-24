@@ -29,9 +29,12 @@ export class MITController {
     const sort_by = req.query.sort_by
     const last_known = req.query.last_known
     const address = req.query.address
+    const avatar = req.query.avatar
+
     Output.find({
       ...(last_known && { _id: { $lt: last_known } }),
       ...(address && { ['address']: address}),
+      ...(avatar && { ['attachment.to_did']: avatar}),
       ['attachment.type']: 'mit',
       spent_tx: 0,
     })
