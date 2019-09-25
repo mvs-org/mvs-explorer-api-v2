@@ -28,6 +28,8 @@ export class CertificateController {
 
     const sort_by = req.query.sort_by
     const last_known = req.query.last_known
+    const limit = Math.min(req.query.limit || 20, 50);
+
     Output.find({
       ...(last_known && { _id: { $lt: last_known } }),
       ['attachment.type']: 'asset-cert',
@@ -37,7 +39,7 @@ export class CertificateController {
         ...(sort_by === 'symbol' && { ['attachment.symbol']: 1 }),
         ...(sort_by !== 'symbol' && { height: -1 }),
       })
-      .limit(20)
+      .limit(limit)
       .then((result) => {
         if (last_known) {
           res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
