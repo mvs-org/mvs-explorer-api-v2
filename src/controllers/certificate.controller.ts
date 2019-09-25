@@ -28,10 +28,14 @@ export class CertificateController {
 
     const sort_by = req.query.sort_by
     const last_known = req.query.last_known
+    const address = req.query.address
+    const avatar = req.query.avatar
     const limit = Math.min(req.query.limit || 20, 50);
 
     Output.find({
       ...(last_known && { _id: { $lt: last_known } }),
+      ...(address && { ['address']: address}),
+      ...(avatar && { ['attachment.to_did']: avatar}),
       ['attachment.type']: 'asset-cert',
       orphaned_at: 0,
     })
