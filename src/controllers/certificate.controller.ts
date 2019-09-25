@@ -37,7 +37,7 @@ export class CertificateController {
       ...(last_known && { _id: { $lt: last_known } }),
       ...(address && { ['address']: address }),
       ...(avatar && { ['attachment.to_did']: avatar }),
-      ...(spent && { spent_tx: 0 }),
+      ...(!spent && { spent_tx: 0 }),
       ['attachment.type']: 'asset-cert',
       orphaned_at: 0,
     })
