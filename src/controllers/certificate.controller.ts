@@ -30,16 +30,19 @@ export class CertificateController {
     const last_known = req.query.last_known
     const address = req.query.address
     const avatar = req.query.avatar
-    const limit = Math.min(req.query.limit || 20, 50);
+    const limit = Math.min(req.query.limit || 20, 50)
+    const spent = req.query.spent || false
 
     Output.find({
       ...(last_known && { _id: { $lt: last_known } }),
-      ...(address && { ['address']: address}),
-      ...(avatar && { ['attachment.to_did']: avatar}),
+      ...(address && { ['address']: address }),
+      ...(avatar && { ['attachment.to_did']: avatar }),
+      ...(spent && { spent_tx: 0 }),
       ['attachment.type']: 'asset-cert',
       orphaned_at: 0,
     })
       .sort({
+        ...(spent && { spent_tx: 1 }),
         ...(sort_by === 'symbol' && { ['attachment.symbol']: 1 }),
         ...(sort_by !== 'symbol' && { height: -1 }),
       })
@@ -62,7 +65,7 @@ export class CertificateController {
     const type = req.query.type || undefined
     const symbol = req.query.symbol.toUpperCase()
     Output.find({
-      ...(type && { ['attachment.cert']: type}),
+      ...(type && { ['attachment.cert']: type }),
       ['attachment.type']: 'asset-cert',
       ['attachment.symbol']: symbol,
       orphaned_at: 0,
