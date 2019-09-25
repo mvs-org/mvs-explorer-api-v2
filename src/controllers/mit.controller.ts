@@ -30,6 +30,7 @@ export class MITController {
     const last_known = req.query.last_known
     const address = req.query.address
     const avatar = req.query.avatar
+    const limit = Math.min(req.query.limit || 20, 50);
 
     Output.find({
       ...(last_known && { _id: { $lt: last_known } }),
@@ -42,7 +43,7 @@ export class MITController {
         ...(sort_by === 'symbol' && { ['attachment.symbol']: 1 }),
         ...(sort_by !== 'symbol' && { height: -1 }),
       })
-      .limit(20)
+      .limit(limit)
       .then((result) => {
         if (last_known) {
           res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
