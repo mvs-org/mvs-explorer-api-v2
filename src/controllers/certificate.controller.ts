@@ -43,9 +43,7 @@ export class CertificateController {
       orphaned_at: 0,
     })
       .sort({
-        ...(spent && { spent_tx: 1 }),
         ...(sort_by === 'symbol' && { ['attachment.symbol']: 1 }),
-        ...(sort_by !== 'symbol' && { height: -1 }),
       })
       .limit(limit)
       .then((result) => {

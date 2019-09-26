@@ -42,7 +42,6 @@ export class MITController {
     })
       .sort({
         ...(sort_by === 'symbol' && { ['attachment.symbol']: 1 }),
-        ...(sort_by !== 'symbol' && { height: -1 }),
       })
       .limit(limit)
       .then((result) => {
