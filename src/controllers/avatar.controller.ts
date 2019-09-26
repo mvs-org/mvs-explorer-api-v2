@@ -28,7 +28,6 @@ export class AvatarController {
     Avatar.find({ ...(last_known && { _id: { $lt: last_known } }) })
       .sort({
         ...(sort_by === 'symbol' && { symbol: 1 }),
-        ...(sort_by !== 'symbol' && { height: -1 }),
       })
       .limit(20)
       .then((result) => {
