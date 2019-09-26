@@ -10,6 +10,7 @@ export class MITController {
   public info(req: Request, res: Response) {
     Output.find({
       ['attachment.type']: 'mit',
+      spent_tx: 0,
       orphaned_at: 0,
     })
       .count()

@@ -10,6 +10,7 @@ export class CertificateController {
   public info(req: Request, res: Response) {
     Output.find({
       ['attachment.type']: 'asset-cert',
+      spent_tx: 0,
       orphaned_at: 0,
     })
       .count()
