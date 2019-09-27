@@ -42,6 +42,7 @@ export class MITController {
     })
       .sort({
         ...(sort_by === 'symbol' && { ['attachment.symbol']: 1 }),
+        ...(sort_by !== 'symbol' && { _id: -1 }),
       })
       .limit(limit)
       .then((result) => {
