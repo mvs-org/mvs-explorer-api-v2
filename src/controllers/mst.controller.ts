@@ -87,7 +87,8 @@ export class MSTController {
     const min = req.query.min || 1
     let lastAddressBalance = undefined
     if (req.query.lastAddress) {
-      lastAddressBalance = (await AddressBalances.findOne({ _id: lastAddress })).toObject().value.get(symbol)
+      const balances = await AddressBalances.findOne({ _id: lastAddress })
+      lastAddressBalance = balances ? balances.toObject().value.get(symbol) : undefined
     }
     AddressBalances.find({
       ['value.' + symbol]: {
