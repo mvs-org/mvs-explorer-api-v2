@@ -89,12 +89,16 @@ export class MSTController {
     if (req.query.lastAddress) {
       const balances = await AddressBalances.findOne({ _id: lastAddress })
       lastAddressBalance = balances ? balances.toObject().value.get(symbol) : undefined
+      if (!lastAddressBalance) {
+        //Wrong lastAddress or no balance for this MST
+        lastAddressBalance = -1
+      }
     }
     AddressBalances.find({
       ['value.' + symbol]: {
         $gt: min,
       },
-      ...(lastAddressBalance && { ['value.' + symbol]: { $lte: lastAddressBalance } }),
+      ...(lastAddressBalance && { ['value.' + symbol]: { $gt: min, $lte: lastAddressBalance } }),
     })
       .sort({
         ['value.' + symbol]: -1,
@@ -117,6 +121,7 @@ export class MSTController {
           q: addressBalances.toObject().value.get(symbol),
         }
       }))
+
       .then((result) => {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=1800')
         res.json(new ResponseSuccess(result))
