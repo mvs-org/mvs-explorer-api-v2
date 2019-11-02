@@ -80,4 +80,49 @@ export class MSTController {
       })
   }
 
+  public async listStakes(req: Request, res: Response) {
+    const symbol = req.query.symbol.toUpperCase().replace(/\./g, '_') || 'ETP'
+    const lastAddress = req.query.lastAddress
+    const limit = Math.min(req.query.limit || 20, 100)
+    const min = req.query.min || 1
+    let lastAddressBalance = undefined
+    if (req.query.lastAddress) {
+      lastAddressBalance = (await AddressBalances.findOne({ _id: lastAddress })).toObject().value.get(symbol)
+    }
+    AddressBalances.find({
+      ['value.' + symbol]: {
+        $gt: min,
+      },
+      ...(lastAddressBalance && { ['value.' + symbol]: { $lte: lastAddressBalance } }),
+    })
+      .sort({
+        ['value.' + symbol]: -1,
+        _id: 1,
+      })
+      .then((fullList) => {
+        let i = 0
+        if (lastAddress) {
+          i = fullList.findIndex(addressBalance => addressBalance._id == lastAddress) + 1
+        }
+        let result = fullList.slice(i, i + limit)
+        if (result && result[result.length - 1].toObject()._id == 'coinbase') {
+          result.pop()
+        }
+        return result
+      })
+      .then((result) => result.map((addressBalances: mongoose.Document) => {
+        return {
+          a: addressBalances.toObject()._id,
+          q: addressBalances.toObject().value.get(symbol),
+        }
+      }))
+      .then((result) => {
+        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=1800')
+        res.json(new ResponseSuccess(result))
+      }).catch((err) => {
+        console.error(err)
+        res.status(400).json(new ResponseError('ERR_LIST_MST_STAKE'))
+      })
+  }
+
 }

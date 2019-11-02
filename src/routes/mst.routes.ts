@@ -9,6 +9,7 @@ export class MSTRoutes {
     app.route('/msts').get(this.mstController.getMSTs)
     app.route('/info/mst').get(this.mstController.info)
     app.route('/msts/special').get(this.mstController.getSpecialMSTs)
+    app.route('/msts/stakes').get(this.mstController.listStakes)
   }
 
 }
