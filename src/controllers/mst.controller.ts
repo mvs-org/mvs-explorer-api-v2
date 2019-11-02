@@ -110,7 +110,7 @@ export class MSTController {
           i = fullList.findIndex(addressBalance => addressBalance._id == lastAddress) + 1
         }
         let result = fullList.slice(i, i + limit)
-        if (result && result[result.length - 1].toObject()._id == 'coinbase') {
+        if (result && result.length > 0 && result[result.length - 1].toObject()._id == 'coinbase') {
           result.pop()
         }
         return result
