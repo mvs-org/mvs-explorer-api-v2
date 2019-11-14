@@ -14,6 +14,7 @@ export class TransactionController {
     const min_time = req.query.min_time
     const max_time = req.query.max_time
     const address = req.query.address
+    const limit = Math.min(req.query.limit, 100) || 20
 
     const query: any = { orphan: 0 }
 
@@ -47,7 +48,7 @@ export class TransactionController {
     }
     Transaction.find(query, output)
       .sort({ height: -1 })
-      .limit(20)
+      .limit(limit)
       .then((result) => {
         if (last_known) {
           res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
