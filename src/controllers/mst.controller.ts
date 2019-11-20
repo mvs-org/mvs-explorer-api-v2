@@ -98,6 +98,9 @@ export class MSTController {
       ['value.' + symbol]: {
         $gt: min,
       },
+      _id: {
+        $ne: '1111111111111111111114oLvT2',
+      },
       ...(lastAddressBalance && { ['value.' + symbol]: { $gt: min, $lte: lastAddressBalance } }),
     })
       .sort({
