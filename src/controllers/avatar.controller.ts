@@ -1,9 +1,11 @@
 import { Request, Response } from 'express'
 import * as mongoose from 'mongoose'
 import { AvatarSchema } from '../models/avatar.model'
+import { OutputSchema } from '../models/output.model'
 import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 
 const Avatar = mongoose.model('Avatar', AvatarSchema)
+const Output = mongoose.model('Output', OutputSchema)
 
 export class AvatarController {
 
@@ -58,6 +60,23 @@ export class AvatarController {
     }).catch((err) => {
       console.error(err)
       res.status(400).json(new ResponseError('ERR_GET_AVATAR_AVAILABILITY'))
+    })
+  }
+
+  public getAvatarAssets(req: Request, res: Response) {
+
+    const symbol = req.params.symbol
+
+    Output.find({
+      'attachment.type': 'asset-issue',
+      'attachment.to_did': symbol
+    })
+    .then((result) => {
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+      res.json(new ResponseSuccess(result))
+    }).catch((err) => {
+      console.error(err)
+      res.status(400).json(new ResponseError('ERR_GET_AVATAR_ASSETS'))
     })
   }
 

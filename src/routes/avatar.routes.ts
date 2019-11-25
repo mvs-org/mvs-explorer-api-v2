@@ -9,5 +9,6 @@ export class AvatarRoutes {
     app.route('/avatars').get(this.avatarController.getAvatars)
     app.route('/info/avatar').get(this.avatarController.info)
     app.route('/avatar/available/:symbol').get(this.avatarController.getAvatarAvailability)
+    app.route('/avatar/:symbol/assets').get(this.avatarController.getAvatarAssets)
   }
 }
