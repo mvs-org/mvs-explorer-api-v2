@@ -141,8 +141,15 @@ export class TransactionController {
 
     Transaction.find({
       ...(last_known && { _id: { $gt: last_known } }),
-      ...(blockhash && { block: blockhash}),
-      ...(blockheight && { height: blockheight, orphan: 0}),
+      ...(blockhash && { block: blockhash }),
+      ...(blockheight && { height: blockheight, orphan: 0 }),
+    }, {
+      "inputs": {
+        "$slice": 5
+      },
+      "outputs": {
+        "$slice": 5
+      }
     })
       .limit(limit)
       .then((result) => {
