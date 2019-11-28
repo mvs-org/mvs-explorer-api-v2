@@ -128,4 +128,34 @@ export class TransactionController {
       res.status(400).json(new ResponseError('ERR_LIST_TRANSACTIONS'))
     }
   }
+
+  public getBlockTxs(req: Request, res: Response) {
+
+    const blockhash = req.query.hash
+    const blockheight = req.query.height
+    if(!blockhash && !blockheight) {
+      res.status(400).json(new ResponseError('ERR_BLOCK_NOT_SPECIFIED'))
+    }
+    const last_known = req.query.last_known
+    const limit = Math.min(req.query.limit, 100) || 20
+
+    Transaction.find({
+      ...(last_known && { _id: { $lt: last_known } }),
+      ...(blockhash && { block: blockhash}),
+      ...(blockheight && { height: blockheight, orphan: 0}),
+    })
+      .limit(limit)
+      .then((result) => {
+        if (last_known) {
+          res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
+        } else {
+          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+        }
+        res.json(new ResponseSuccess(result))
+      }).catch((err) => {
+        console.error(err)
+        res.status(400).json(new ResponseError('ERR_GET_BLOCK_TXS'))
+      })
+  }
+
 }

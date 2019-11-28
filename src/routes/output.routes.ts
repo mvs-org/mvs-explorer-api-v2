@@ -1,6 +1,5 @@
 import { Application } from 'express'
 import { OutputController } from '../controllers/output.controller'
-import { shortCacheSuccess } from '../helpers/cache.helper'
 
 export class OutputRoutes {
 
