@@ -140,7 +140,7 @@ export class TransactionController {
     const limit = Math.min(req.query.limit, 100) || 20
 
     Transaction.find({
-      ...(last_known && { _id: { $lt: last_known } }),
+      ...(last_known && { _id: { $gt: last_known } }),
       ...(blockhash && { block: blockhash}),
       ...(blockheight && { height: blockheight, orphan: 0}),
     })
