@@ -22,6 +22,7 @@ export class ElectionController {
 
     const cycle = parseInt(req.query.cycle)
     const type = req.query.type || 'supernode'
+    const limit = 1000
 
     const query: any = {
       'vote.type': type,
@@ -29,14 +30,17 @@ export class ElectionController {
     }
 
     Output.find(query, voteFormat)
+      .limit(limit)
       .sort({ 'height': 1 })
-      .then(result=>Promise.all(result.map((output: any)=>[{
-        address: output.address,
-        quantity: output.attachment.get('quantity'),
-        height: output.height,
-        tx: output.tx,
-        candidate: output.vote.get('candidate'),
-      }])))
+      .then(result => Promise.all(result.map((output: any) => {
+        return {
+          address: output.address,
+          quantity: output.attachment.get('quantity'),
+          height: output.height,
+          tx: output.tx,
+          candidate: output.vote.get('candidate'),
+        }
+      })))
       .then((result) => {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
         res.json(new ResponseSuccess(result))
@@ -58,9 +62,9 @@ export class ElectionController {
 
     const o: any = {};
     o.reduce = `(key, values)=>Array.sum(values)`
-    o.map= `function(){return emit(this.vote.candidate, this.vote.amount)}`
-    o.query=query
-    o.out={inline: 1}
+    o.map = `function(){return emit(this.vote.candidate, this.vote.amount)}`
+    o.query = query
+    o.out = { inline: 1 }
 
     Output.mapReduce(o)
       .then((result) => {
