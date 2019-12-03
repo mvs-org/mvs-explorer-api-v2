@@ -15,4 +15,5 @@ export const OutputSchema = new Schema({
   spent_tx: Schema.Types.Mixed,
   tx: String,
   value: Number,
+  vote: Map,
 }, {collection: 'output'})

@@ -9,6 +9,7 @@ import { MSTRoutes } from './routes/mst.routes'
 import { OutputRoutes } from './routes/output.routes'
 import { TransactionRoutes } from './routes/transaction.routes'
 import { AddressRoutes } from './routes/address.routes';
+import { ElectionRoutes } from './routes/election.routes';
 
 class App {
 
@@ -21,7 +22,8 @@ class App {
   public mstRoutes: MSTRoutes = new MSTRoutes()
   public blockRoutes: BlockRoutes = new BlockRoutes()
   public certificateRoutes: CertificateRoutes = new CertificateRoutes()
-  public mongoUrl: string = (process.env.MONGO_URL) ? process.env.MONGO_URL : 'mongodb://localhost:27017/metaverse'
+  public electionRoutes: ElectionRoutes = new ElectionRoutes()
+  public mongoUrl: string = (process.env.MONGO_URL) ? process.env.MONGO_URL : 'mongodb://localhost:27017/testnet'
 
   constructor() {
     this.app = express()
@@ -34,6 +36,7 @@ class App {
     this.mstRoutes.routes(this.app)
     this.blockRoutes.routes(this.app)
     this.certificateRoutes.routes(this.app)
+    this.electionRoutes.routes(this.app)
     this.mongoSetup()
   }
 

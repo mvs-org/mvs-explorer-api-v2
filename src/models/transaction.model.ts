@@ -30,6 +30,7 @@ export const OutputSchema = new Schema({
   spent_tx: String,
   tx: String,
   value: Number,
+  vote: Map,
 })
 
 export const TransactionSchema = new Schema({
