@@ -4,6 +4,8 @@ import { OutputSchema } from '../models/output.model'
 import {get} from 'superagent' 
 import { ResponseError, ResponseSuccess } from '../helpers/message.helper'
 
+declare function emit(k, v);
+
 const Output = mongoose.model('Output', OutputSchema)
 
 export class ElectionController {
@@ -26,7 +28,6 @@ export class ElectionController {
 
     const cycle = parseInt(req.query.cycle)
     const type = req.query.type || 'supernode'
-    const limit = 1000
 
     const query: any = {
       'vote.type': type,
@@ -45,7 +46,6 @@ export class ElectionController {
     }
 
     Output.find(query, voteFormat)
-      .limit(limit)
       .sort({ 'height': 1 })
       .then(result => Promise.all(result.map((output: any) => {
         return {
@@ -67,7 +67,7 @@ export class ElectionController {
 
   public getResult(req: Request, res: Response) {
 
-    const cycle = req.query.cycle
+    const cycle = parseInt(req.query.cycle)
     const type = req.query.type || 'supernode'
 
     const query: any = {
@@ -76,15 +76,20 @@ export class ElectionController {
     }
 
     const o: any = {};
-    o.reduce = `(key, values)=>Array.sum(values)`
-    o.map = `function(){return emit(this.vote.candidate, this.vote.amount)}`
+    o.reduce = `function(key, values){ return Array.sum(values)}`
+    o.map = function(){return emit(this.vote.candidate, this.attachment.quantity)}
     o.query = query
     o.out = { inline: 1 }
 
     Output.mapReduce(o)
-      .then((result) => {
+      .then((mapResult) => {
+        const result = {}
+        
+        mapResult.results.forEach(candidate=>{
+          result[candidate._id]=candidate.value
+        })
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
-        res.json(new ResponseSuccess(result.result))
+        res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)
         res.status(400).json(new ResponseError('ERR_GET_ELECTION_RESULTS'))
