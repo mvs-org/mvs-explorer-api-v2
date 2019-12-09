@@ -8,6 +8,10 @@ declare function emit(k, v);
 
 const Output = mongoose.model('Output', OutputSchema)
 
+export const INTERVAL_DNA_VOTE_PERIOD = (process.env.INTERVAL_DNA_VOTE_PERIOD) ? process.env.INTERVAL_DNA_VOTE_PERIOD : 60000
+export const INTERVAL_DNA_VOTE_OFFSET = (process.env.INTERVAL_DNA_VOTE_OFFSET) ? process.env.INTERVAL_DNA_VOTE_OFFSET : 1000
+export const INTERVAL_DNA_MANDATE_OFFSET = (process.env.INTERVAL_DNA_MANDATE_OFFSET) ? process.env.INTERVAL_DNA_MANDATE_OFFSET : 0
+
 export class ElectionController {
 
   public getCandidates(req: Request, res: Response) {
@@ -17,7 +21,12 @@ export class ElectionController {
       .then(selections=>Promise.all(selections.map(selection=>selection.selectionName)))
       .then((candidates) => {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
-        res.json(new ResponseSuccess({candidates}))
+        res.json(new ResponseSuccess({
+          candidates,
+          votePeriod: INTERVAL_DNA_VOTE_PERIOD,
+          voteOffset: INTERVAL_DNA_VOTE_OFFSET,
+          mandateOffset: INTERVAL_DNA_MANDATE_OFFSET,
+        }))
         //res.json(new ResponseSuccess({candidates: []}))
       }).catch((err) => {
         console.error(err)
