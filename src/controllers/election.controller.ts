@@ -8,10 +8,10 @@ declare function emit(k, v);
 
 const Output = mongoose.model('Output', OutputSchema)
 
-export const INTERVAL_DNA_VOTE_PERIOD = (process.env.INTERVAL_DNA_VOTE_PERIOD) ? process.env.INTERVAL_DNA_VOTE_PERIOD : 60000
-export const INTERVAL_DNA_VOTE_OFFSET = (process.env.INTERVAL_DNA_VOTE_OFFSET) ? process.env.INTERVAL_DNA_VOTE_OFFSET : 1000
-export const INTERVAL_DNA_MANDATE_OFFSET = (process.env.INTERVAL_DNA_MANDATE_OFFSET) ? process.env.INTERVAL_DNA_MANDATE_OFFSET : 0
-export const INTERVAL_DNA_VOTE_ON_HOLD = (process.env.INTERVAL_DNA_VOTE_ON_HOLD) ? process.env.INTERVAL_DNA_VOTE_ON_HOLD : 0
+export const INTERVAL_DNA_VOTE_PERIOD = (process.env.INTERVAL_DNA_VOTE_PERIOD) ? parseInt(process.env.INTERVAL_DNA_VOTE_PERIOD) : 60000
+export const INTERVAL_DNA_VOTE_OFFSET = (process.env.INTERVAL_DNA_VOTE_OFFSET) ? parseInt(process.env.INTERVAL_DNA_VOTE_OFFSET) : 1000
+export const INTERVAL_DNA_MANDATE_OFFSET = (process.env.INTERVAL_DNA_MANDATE_OFFSET) ? parseInt(process.env.INTERVAL_DNA_MANDATE_OFFSET) : 0
+export const INTERVAL_DNA_VOTE_ON_HOLD = (process.env.INTERVAL_DNA_VOTE_ON_HOLD) ? parseInt(process.env.INTERVAL_DNA_VOTE_ON_HOLD) : 0
 
 export class ElectionController {
 
