@@ -11,6 +11,7 @@ const Output = mongoose.model('Output', OutputSchema)
 export const INTERVAL_DNA_VOTE_PERIOD = (process.env.INTERVAL_DNA_VOTE_PERIOD) ? process.env.INTERVAL_DNA_VOTE_PERIOD : 60000
 export const INTERVAL_DNA_VOTE_OFFSET = (process.env.INTERVAL_DNA_VOTE_OFFSET) ? process.env.INTERVAL_DNA_VOTE_OFFSET : 1000
 export const INTERVAL_DNA_MANDATE_OFFSET = (process.env.INTERVAL_DNA_MANDATE_OFFSET) ? process.env.INTERVAL_DNA_MANDATE_OFFSET : 0
+export const INTERVAL_DNA_VOTE_ON_HOLD = (process.env.INTERVAL_DNA_VOTE_ON_HOLD) ? process.env.INTERVAL_DNA_VOTE_ON_HOLD : 0
 
 export class ElectionController {
 
@@ -22,12 +23,12 @@ export class ElectionController {
       .then((candidates) => {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
         res.json(new ResponseSuccess({
-          candidates,
+          candidates: INTERVAL_DNA_VOTE_ON_HOLD ? [] : candidates,
           votePeriod: INTERVAL_DNA_VOTE_PERIOD,
           voteOffset: INTERVAL_DNA_VOTE_OFFSET,
           mandateOffset: INTERVAL_DNA_MANDATE_OFFSET,
+          onHold: INTERVAL_DNA_VOTE_ON_HOLD
         }))
-        //res.json(new ResponseSuccess({candidates: []}))
       }).catch((err) => {
         console.error(err)
         res.status(400).json(new ResponseError('ERR_GET_CANDIDATES'))
