@@ -17,8 +17,8 @@ export class ElectionController {
       .then(selections=>Promise.all(selections.map(selection=>selection.selectionName)))
       .then((candidates) => {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
-        //res.json(new ResponseSuccess({candidates}))
-        res.json(new ResponseSuccess({candidates: []}))
+        res.json(new ResponseSuccess({candidates}))
+        //res.json(new ResponseSuccess({candidates: []}))
       }).catch((err) => {
         console.error(err)
         res.status(400).json(new ResponseError('ERR_GET_CANDIDATES'))
