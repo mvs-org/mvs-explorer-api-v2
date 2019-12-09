@@ -12,7 +12,7 @@ export class ElectionController {
 
   public getCandidates(req: Request, res: Response) {
 
-    get('http://tulipex-uat-dnavote-1731513089.us-east-1.elb.amazonaws.com/api/dna-selection/v1/period/simple-info')
+    get('http://tulipex-prod-dnavote-web-1124382027.us-east-1.elb.amazonaws.com/api/dna-selection/v1/period/simple-info')
       .then(apiResponse => apiResponse.body.data.periodSelections)
       .then(selections=>Promise.all(selections.map(selection=>selection.selectionName)))
       .then((candidates) => {
