@@ -10,10 +10,6 @@ declare function emit(k, v);
 const Output = mongoose.model('Output', OutputSchema)
 const Block = mongoose.model('Block', BlockSchema)
 
-export const INTERVAL_DNA_VOTE_PERIOD = (process.env.INTERVAL_DNA_VOTE_PERIOD) ? parseInt(process.env.INTERVAL_DNA_VOTE_PERIOD) : 60000
-export const INTERVAL_DNA_LOCK_PERIOD = (process.env.INTERVAL_DNA_LOCK_PERIOD) ? parseInt(process.env.INTERVAL_DNA_LOCK_PERIOD) : 60000
-export const INTERVAL_DNA_VOTE_OFFSET = (process.env.INTERVAL_DNA_VOTE_OFFSET) ? parseInt(process.env.INTERVAL_DNA_VOTE_OFFSET) : 1000
-export const INTERVAL_DNA_MANDATE_OFFSET = (process.env.INTERVAL_DNA_MANDATE_OFFSET) ? parseInt(process.env.INTERVAL_DNA_MANDATE_OFFSET) : 0
 export const INTERVAL_DNA_VOTE_ON_HOLD = (process.env.INTERVAL_DNA_VOTE_ON_HOLD) ? parseInt(process.env.INTERVAL_DNA_VOTE_ON_HOLD) : 0
 
 export const INTERVAL_DNA_VOTE_EARLY_BIRD_START = (process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_START) ? parseInt(process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_START) : 3080000
@@ -21,27 +17,6 @@ export const INTERVAL_DNA_VOTE_EARLY_BIRD_END = (process.env.INTERVAL_DNA_LOCK_P
 export const INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL = (process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL) ? parseInt(process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL) : 3200000
 
 export class ElectionController {
-
-  public getCandidates(req: Request, res: Response) {
-
-    get('http://tulipex-prod-dnavote-web-1124382027.us-east-1.elb.amazonaws.com/api/dna-selection/v1/period/simple-info')
-      .then(apiResponse => apiResponse.body.data.periodSelections)
-      .then(selections => Promise.all(selections.map(selection => selection.selectionName)))
-      .then((candidates) => {
-        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
-        res.json(new ResponseSuccess({
-          candidates: INTERVAL_DNA_VOTE_ON_HOLD ? [] : candidates,
-          votePeriod: INTERVAL_DNA_VOTE_PERIOD,
-          lockPeriod: INTERVAL_DNA_LOCK_PERIOD,
-          voteOffset: INTERVAL_DNA_VOTE_OFFSET,
-          mandateOffset: INTERVAL_DNA_MANDATE_OFFSET,
-          onHold: INTERVAL_DNA_VOTE_ON_HOLD
-        }))
-      }).catch((err) => {
-        console.error(err)
-        res.status(400).json(new ResponseError('ERR_GET_CANDIDATES'))
-      })
-  }
 
   public getCandidatesEarlyBird(req: Request, res: Response) {
 
@@ -129,7 +104,7 @@ export class ElectionController {
           address: output.address,
           quantity: output.attachment.get('quantity'),
           lockedAt: output.height,
-          lockedUntil: output.vote.lockedUntil,
+          lockedUntil: output.vote.get('lockedUntil'),
           tx: output.tx,
           asset: output.attachment.symbol,
           candidate: output.vote.get('candidate'),
