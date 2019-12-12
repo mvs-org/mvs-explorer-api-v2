@@ -92,12 +92,23 @@ export class ElectionController {
 
   public getVotes(req: Request, res: Response) {
 
-    const cycle = parseInt(req.query.cycle)
-    const type = req.query.type || 'supernode'
+    const minVoteHeight = parseInt(req.query.minVoteHeight)
+    const maxVoteHeight = parseInt(req.query.maxVoteHeight)
+
+    const minUnlockHeight = parseInt(req.query.minUnlockHeight)
+    const type = req.query.type
+    const asset = req.query.asset
 
     const query: any = {
       'vote.type': type,
-      'vote.cycles': cycle,
+      'height': {
+        $gte: minVoteHeight,
+        $lte: maxVoteHeight,
+      },
+      'attachment.symbol': asset,
+    }
+    if(minUnlockHeight){
+      query['vote.lockedUntil'] = { $gte: minUnlockHeight }
     }
 
     const voteFormat = {
@@ -117,8 +128,10 @@ export class ElectionController {
         return {
           address: output.address,
           quantity: output.attachment.get('quantity'),
-          height: output.height,
+          lockedAt: output.height,
+          lockedUntil: output.vote.lockedUntil,
           tx: output.tx,
+          asset: output.attachment.symbol,
           candidate: output.vote.get('candidate'),
         }
       })))
@@ -133,12 +146,23 @@ export class ElectionController {
 
   public getResult(req: Request, res: Response) {
 
-    const cycle = parseInt(req.query.cycle)
-    const type = req.query.type || 'supernode'
+    const minVoteHeight = parseInt(req.query.minVoteHeight)
+    const maxVoteHeight = parseInt(req.query.maxVoteHeight)
+
+    const minUnlockHeight = parseInt(req.query.minUnlockHeight)
+    const type = req.query.type
+    const asset = req.query.asset
 
     const query: any = {
       'vote.type': type,
-      'vote.cycles': cycle,
+      'height': {
+        $gte: minVoteHeight,
+        $lte: maxVoteHeight,
+      },
+      'attachment.symbol': asset,
+    }
+    if(minUnlockHeight){
+      query['vote.lockedUntil'] = { $gte: minUnlockHeight }
     }
 
     const o: any = {};
