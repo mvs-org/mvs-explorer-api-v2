@@ -20,7 +20,7 @@ export class ElectionController {
 
   public getCandidatesEarlyBird(req: Request, res: Response) {
 
-    get('http://tulipex-prod-dnavote-web-1124382027.us-east-1.elb.amazonaws.com/api/dna-selection/v1/period/simple-info')
+    get('https://www.dnavote.com/api/dna-selection/v1/period/simple-info')
       .then(apiResponse => apiResponse.body.data.periodSelections)
       .then(selections => Promise.all(selections.map(selection => selection.selectionName)))
       .then((candidates) => {
