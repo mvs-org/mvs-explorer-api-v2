@@ -7,6 +7,23 @@ const Block = mongoose.model('Block', BlockSchema)
 
 export class BlockController {
 
+  public getHeight(req: Request, res: Response) {
+    Block.find({
+      orphan: 0,
+    })
+      .sort({
+        number: -1,
+      })
+      .limit(1)
+      .then((result) => {
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+        res.json(new ResponseSuccess(result[0].toObject().number))
+      }).catch((err) => {
+        console.error(err)
+        res.status(400).json(new ResponseError('ERR_GET_HEIGHT'))
+      })
+  }
+
   public getBlocks(req: Request, res: Response) {
 
     const sort_by = req.query.sort_by
