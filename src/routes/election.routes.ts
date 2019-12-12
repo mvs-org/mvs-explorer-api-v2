@@ -7,6 +7,7 @@ export class ElectionRoutes {
 
   public routes(app: Application): void {
     app.route('/election/candidates').get(this.ElectionController.getCandidates)
+    app.route('/election/candidates/earlybird').get(this.ElectionController.getCandidatesEarlyBird)
     app.route('/election/votes').get(this.ElectionController.getVotes)
     app.route('/election/result').get(this.ElectionController.getResult)
   }
