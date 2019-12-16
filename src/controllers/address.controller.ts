@@ -59,7 +59,7 @@ export class AddressController {
     }
 
     const o: any = {}
-    o.reduce = `(symbol, values) => Array.sum(values)`
+    o.reduce = `function(symbol, values){ return Array.sum(values)}`
 
     Output.mapReduce({
       map: function () {
