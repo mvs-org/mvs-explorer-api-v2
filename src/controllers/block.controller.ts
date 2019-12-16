@@ -51,7 +51,7 @@ export class BlockController {
 
   public getHeightFromTimestamp(req: Request, res: Response) {
 
-    const timestamp = parseInt(req.query.timestamp)
+    const timestamp = parseInt(req.params.timestamp)
     const current_time = Date.now()/1000
     const blocktime_range = 10000
 
@@ -67,7 +67,7 @@ export class BlockController {
         })
         .limit(1)
         .then((result) => {
-          res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+          res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600')
           res.json(new ResponseSuccess(result[0].toObject().number))
         }).catch((err) => {
           console.error(err)
