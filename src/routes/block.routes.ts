@@ -8,5 +8,6 @@ export class BlockRoutes {
   public routes(app: Application): void {
     app.route('/blocks').get(this.blockController.getBlocks)
     app.route('/height').get(this.blockController.getHeight)
+    app.route('/block/fromtime/:timestamp').get(this.blockController.getHeightFromTimestamp)
   }
 }
