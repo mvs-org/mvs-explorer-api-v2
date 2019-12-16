@@ -7,5 +7,6 @@ export class AddressRoutes {
 
   public routes(app: Application): void {
     app.route('/address/publickey/:address').get(this.addressController.getPublicKey)
+    app.route('/addresses/balance/diff').get(this.addressController.getBalanceDiff)
   }
 }
