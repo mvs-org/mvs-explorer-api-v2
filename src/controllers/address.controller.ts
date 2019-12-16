@@ -58,6 +58,9 @@ export class AddressController {
       addresses = [addresses]
     }
 
+    const o: any = {}
+    o.reduce = `(symbol, values) => Array.sum(values)`
+
     Output.mapReduce({
       map: function () {
         if (this.attachment.type === 'asset-transfer' && this.attachment.symbol !== 'ETP') {
@@ -85,7 +88,7 @@ export class AddressController {
           }
         }
       },
-      reduce: (symbol, values) => `Array.sum(values)`,
+      ...o,
       query: {
         address: { $in: addresses },
         height: { $lte: toHeight },
