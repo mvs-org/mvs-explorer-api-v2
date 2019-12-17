@@ -3,8 +3,12 @@ import { Request, Response } from 'express'
 import * as mongoose from 'mongoose'
 import { TransactionSchema } from '../models/transaction.model'
 import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
+import { OutputSchema } from '../models/output.model'
 
 const Transaction = mongoose.model('Tx', TransactionSchema)
+const Output = mongoose.model('Output', OutputSchema)
+
+declare function emit(k, v);
 
 export class AddressController {
 
@@ -42,5 +46,87 @@ export class AddressController {
       res.status(500).json(new ResponseError('ERR_CANT_FIND_PUBLIC_KEY'))
     }
   }
+
+  public async getBalanceDiff(req: Request, res: Response) {
+
+    let addresses: string | string[] = req.query.addresses
+
+    const fromHeight = parseInt(req.query.fromHeight)
+    const toHeight = parseInt(req.query.toHeight)
+
+    if (typeof addresses === 'string') {
+      addresses = [addresses]
+    }
+
+    const o: any = {}
+    o.reduce = `function(symbol, values){ return Array.sum(values)}`
+
+    Output.mapReduce({
+      map: function () {
+        if (this.attachment.type === 'asset-transfer' && this.attachment.symbol !== 'ETP') {
+          if (this.spent_tx) {
+            if (this.height < fromHeight) {
+              emit('DIFF-' + this.attachment.symbol, -this.attachment.quantity);
+            }
+          } else {
+            emit(this.attachment.symbol, this.attachment.quantity)
+            if (this.height >= fromHeight) {
+              emit('DIFF-' + this.attachment.symbol, this.attachment.quantity);
+            }
+          }
+        }
+        if (this.value) {
+          if (this.spent_tx) {
+            if (this.height < fromHeight) {
+              emit('DIFF-ETP', -this.value);
+            }
+          } else {
+            emit('ETP', this.value);
+            if (this.height >= fromHeight) {
+              emit('DIFF-ETP', this.value);
+            }
+          }
+        }
+      },
+      ...o,
+      query: {
+        address: { $in: addresses },
+        height: { $lte: toHeight },
+        $or: [
+          {
+            spent_height: { $gte: fromHeight, $lt: toHeight }
+          },
+          {
+            spent_tx: 0
+          }
+        ],
+        orphaned_at: 0
+      },
+      scope: {
+        fromHeight,
+      },
+      out: { inline: 1 }
+    }
+    ).then((mapResult) => {
+      const result = {
+        diff: {},
+        final: {},
+      }
+      const mstSymbolRegex = /^DIFF\-([A-Za-z0-9]+)$/
+      mapResult.results.forEach(record => {
+        if(mstSymbolRegex.test(record._id)){
+          result.diff[record._id.match(mstSymbolRegex)[1]]=record.value
+        } else {
+          result.final[record._id]=record.value
+        }
+      })
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+      res.json(new ResponseSuccess(result))
+    }).catch((err) => {
+      console.error(err)
+      res.status(400).json(new ResponseError('ERR_GET_BALANCE_DIFF'))
+    })
+  }
+
 
 }
