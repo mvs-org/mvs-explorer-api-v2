@@ -65,10 +65,10 @@ export class AddressController {
       map: function () {
         if (this.attachment.type === 'asset-transfer' && this.attachment.symbol !== 'ETP') {
           if (this.spent_tx) {
-            if (this.height <= fromHeight) {
+            if (this.spent_height>=toHeight) {
+              emit('DIFF-' + this.attachment.symbol, this.attachment.quantity);
+            } else if (this.height <= fromHeight){ // spent after the upper limit
               emit('DIFF-' + this.attachment.symbol, -this.attachment.quantity);
-            } else if (this.spent_height>=toHeight){ // spent after the upper limit
-              emit('DIFF-ETP', this.value);
             }
           } else {
             emit(this.attachment.symbol, this.attachment.quantity)
@@ -79,10 +79,10 @@ export class AddressController {
         }
         if (this.value) {
           if (this.spent_tx) {
-            if (this.height <= fromHeight) {
-              emit('DIFF-ETP', -this.value);
-            } else if (this.spent_height>=toHeight){// spent after the upper limit 
+            if (this.spent_height>=toHeight) {
               emit('DIFF-ETP', this.value);
+            } else if (this.height <= fromHeight){// spent after the upper limit 
+              emit('DIFF-ETP', -this.value);
             }
           } else {
             emit('ETP', this.value);
