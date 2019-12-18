@@ -91,7 +91,7 @@ export class AddressController {
       ...o,
       query: {
         address: { $in: addresses },
-        height: { $lte: toHeight },
+        height: { $lt: toHeight },
         $or: [
           {
             spent_height: { $gte: fromHeight, $lt: toHeight }
