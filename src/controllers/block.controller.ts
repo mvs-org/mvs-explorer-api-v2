@@ -63,7 +63,7 @@ export class BlockController {
         orphan: 0,
       })
         .sort({
-          number: 1,
+          time_stamp: 1,
         })
         .limit(1)
         .then((result) => {
