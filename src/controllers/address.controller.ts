@@ -65,7 +65,7 @@ export class AddressController {
       map: function () {
         if (this.attachment.type === 'asset-transfer' && this.attachment.symbol !== 'ETP') {
           if (this.spent_tx) {
-            if (this.height >= fromHeight) { // old output
+            if (this.height < fromHeight) { // old output
               if (this.spent_height >= toHeight) {
                 emit('DIFF-' + this.attachment.symbol, this.attachment.quantity);
               } else {
@@ -106,7 +106,12 @@ export class AddressController {
         height: { $lt: toHeight },
         $or: [
           {
-            spent_height: { $gte: fromHeight },
+            height: { $gte: fromHeight },
+            spent_height: { $gte: toHeight },
+          },
+          {
+            height: { $lt: fromHeight },
+            spent_height: { $gte: fromHeight, $lt: toHeight },
           },
           {
             spent_tx: 0
