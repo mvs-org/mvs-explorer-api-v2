@@ -67,6 +67,8 @@ export class AddressController {
           if (this.spent_tx) {
             if (this.height <= fromHeight) {
               emit('DIFF-' + this.attachment.symbol, -this.attachment.quantity);
+            } else if (this.spent_height>=toHeight){ // spent after the upper limit
+              emit('DIFF-ETP', this.value);
             }
           } else {
             emit(this.attachment.symbol, this.attachment.quantity)
@@ -79,6 +81,8 @@ export class AddressController {
           if (this.spent_tx) {
             if (this.height <= fromHeight) {
               emit('DIFF-ETP', -this.value);
+            } else if (this.spent_height>=toHeight){// spent after the upper limit 
+              emit('DIFF-ETP', this.value);
             }
           } else {
             emit('ETP', this.value);
@@ -94,7 +98,7 @@ export class AddressController {
         height: { $lt: toHeight },
         $or: [
           {
-            spent_height: { $gte: fromHeight, $lt: toHeight }
+            spent_height: { $gte: fromHeight },
           },
           {
             spent_tx: 0
@@ -104,6 +108,7 @@ export class AddressController {
       },
       scope: {
         fromHeight,
+        toHeight,
       },
       out: { inline: 1 }
     }
