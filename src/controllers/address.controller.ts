@@ -112,7 +112,7 @@ export class AddressController {
         diff: {},
         final: {},
       }
-      const mstSymbolRegex = /^DIFF\-([A-Za-z0-9]+)$/
+      const mstSymbolRegex = /^DIFF\-(.+)$/
       mapResult.results.forEach(record => {
         if(mstSymbolRegex.test(record._id)){
           result.diff[record._id.match(mstSymbolRegex)[1]]=record.value
