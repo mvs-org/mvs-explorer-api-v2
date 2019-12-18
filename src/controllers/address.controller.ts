@@ -65,24 +65,36 @@ export class AddressController {
       map: function () {
         if (this.attachment.type === 'asset-transfer' && this.attachment.symbol !== 'ETP') {
           if (this.spent_tx) {
-            if (this.height <= fromHeight) {
+            if (this.height < fromHeight) { // old output
+              if (this.spent_height >= toHeight) {
+                emit('DIFF-' + this.attachment.symbol, this.attachment.quantity);
+              } else {
+                emit('DIFF-' + this.attachment.symbol, -this.attachment.quantity);
+              }
+            } else {
               emit('DIFF-' + this.attachment.symbol, -this.attachment.quantity);
             }
           } else {
             emit(this.attachment.symbol, this.attachment.quantity)
-            if (this.height > fromHeight) {
+            if (this.height >= fromHeight) {
               emit('DIFF-' + this.attachment.symbol, this.attachment.quantity);
             }
           }
         }
         if (this.value) {
           if (this.spent_tx) {
-            if (this.height <= fromHeight) {
+            if (this.height < fromHeight) { // old output
+              if (this.spent_height >= toHeight) {
+                emit('DIFF-ETP', this.value);
+              } else {
+                emit('DIFF-ETP', -this.value);
+              }
+            } else {
               emit('DIFF-ETP', -this.value);
             }
           } else {
             emit('ETP', this.value);
-            if (this.height > fromHeight) {
+            if (this.height >= fromHeight) {
               emit('DIFF-ETP', this.value);
             }
           }
@@ -94,7 +106,12 @@ export class AddressController {
         height: { $lt: toHeight },
         $or: [
           {
-            spent_height: { $gte: fromHeight, $lt: toHeight }
+            height: { $gte: fromHeight },
+            spent_height: { $gte: toHeight },
+          },
+          {
+            height: { $lt: fromHeight },
+            spent_height: { $gte: fromHeight, $lt: toHeight },
           },
           {
             spent_tx: 0
@@ -104,6 +121,7 @@ export class AddressController {
       },
       scope: {
         fromHeight,
+        toHeight,
       },
       out: { inline: 1 }
     }
@@ -114,10 +132,10 @@ export class AddressController {
       }
       const mstSymbolRegex = /^DIFF\-(.+)$/
       mapResult.results.forEach(record => {
-        if(mstSymbolRegex.test(record._id)){
-          result.diff[record._id.match(mstSymbolRegex)[1]]=record.value
+        if (mstSymbolRegex.test(record._id)) {
+          result.diff[record._id.match(mstSymbolRegex)[1]] = record.value
         } else {
-          result.final[record._id]=record.value
+          result.final[record._id] = record.value
         }
       })
       res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
