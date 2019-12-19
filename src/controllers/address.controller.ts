@@ -70,6 +70,7 @@ export class AddressController {
             } else {
               if (this.spent_height >= toHeight) {
                 emit('DIFF-' + this.attachment.symbol, this.attachment.quantity);
+                emit(this.attachment.symbol, this.attachment.quantity);
               } else {
                 emit('DIFF-' + this.attachment.symbol, -this.attachment.quantity);
               }
@@ -88,6 +89,7 @@ export class AddressController {
             } else {
               if (this.spent_height >= toHeight) {
                 emit('DIFF-ETP', this.value);
+                emit('ETP', this.value);
               } else {
                 emit('DIFF-ETP', -this.value);
               }
