@@ -28,7 +28,7 @@ export const INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL = (process.env.INTERVAL_DNA
 
 export class ElectionController {
 
-  public getCandidatesEarlyBird(req: Request, res: Response) {
+  public getInfo(req: Request, res: Response) {
 
     get(DNAVOTE_API_HOST + '/api/dna-selection/v1/period/simple-info')
       .then((apiResponse) => apiResponse.body.data.periodSelections)
