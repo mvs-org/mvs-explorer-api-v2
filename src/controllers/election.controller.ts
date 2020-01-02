@@ -44,8 +44,10 @@ export class ElectionController {
         res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
         res.json(new ResponseSuccess({
           candidates: INTERVAL_DNA_VOTE_ON_HOLD ? [] : candidates,
+          currentPeriod: CURRENT_PERIOD,
           height,
           lockUntil: INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL,
+          revoteEnabled: REVOTE_ENABLED,
           voteEnd: INTERVAL_DNA_VOTE_EARLY_BIRD_END,
           voteStart: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
         }))
@@ -187,7 +189,6 @@ export class ElectionController {
       const response = rewards.map((reward) => ({
         amount: reward.voteCount,
         period: reward.lockPeriod,
-        revote: reward.lockPeriod === CURRENT_PERIOD - 1 && REVOTE_ENABLED,
         reward: reward.reward,
         txid: reward.transactionId,
       }))
