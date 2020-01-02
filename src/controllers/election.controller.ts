@@ -13,6 +13,8 @@ const Block = mongoose.model('Block', BlockSchema)
 
 export const CURRENT_PERIOD = parseInt(process.env.DNA_VOTE_CURRENT_PERIOD, 10) || 0
 export const REVOTE_ENABLED = process.env.DNA_REVOTE_ENABLED === 'true'
+export const VOTE_ENABLED = process.env.DNA_VOTE_ENABLED === 'true'
+export const VOTE_ENABLED_UNTIL = process.env.DNA_VOTE_ENABLED_UNTIL ? parseInt(process.env.DNA_VOTE_ENABLED_UNTIL, 10) : undefined
 
 export const DNAVOTE_HOST = process.env.DNAVOTE_HOST || 'https://www.dnavote.com'
 
@@ -48,8 +50,10 @@ export class ElectionController {
           height,
           lockUntil: INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL,
           revoteEnabled: REVOTE_ENABLED,
-          voteEnd: INTERVAL_DNA_VOTE_EARLY_BIRD_END,
-          voteStart: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
+          voteEnabled: VOTE_ENABLED,
+          voteEndHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_END,
+          voteEndTime: VOTE_ENABLED_UNTIL,
+          voteStartHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
         }))
       }).catch((err) => {
         console.error(err)
