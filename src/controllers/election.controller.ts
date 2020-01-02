@@ -30,7 +30,7 @@ export class ElectionController {
 
   public getCandidatesEarlyBird(req: Request, res: Response) {
 
-    get(DNAVOTE_HOST + '/api/dna-selection/v1/period/simple-info')
+    get(DNAVOTE_API_HOST + '/api/dna-selection/v1/period/simple-info')
       .then((apiResponse) => apiResponse.body.data.periodSelections)
       .then((selections) => Promise.all(selections.map((selection) => selection.selectionName)))
       .then((candidates) => {
