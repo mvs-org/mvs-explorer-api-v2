@@ -74,8 +74,8 @@ export class ElectionController {
 
     const minVoteHeight = parseInt(req.query.minVoteHeight, 10)
     const maxVoteHeight = parseInt(req.query.maxVoteHeight, 10)
-
     const minUnlockHeight = parseInt(req.query.minUnlockHeight, 10)
+
     const type = req.query.type
     const asset = req.query.asset
 
@@ -185,14 +185,13 @@ export class ElectionController {
         .then((apiResponse) => apiResponse.body.data)
 
       const response = rewards.map((reward) => ({
-        txid: reward.transactionId,
         amount: reward.voteCount,
-        reward: reward.reward,
         period: reward.lockPeriod,
         revote: reward.lockPeriod === CURRENT_PERIOD - 1 && REVOTE_ENABLED,
+        reward: reward.reward,
+        txid: reward.transactionId,
       }))
 
-      res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
       res.json(new ResponseSuccess(response))
     } catch (err) {
       switch (err.message) {
