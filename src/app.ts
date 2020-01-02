@@ -1,15 +1,16 @@
 import * as bodyParser from 'body-parser'
 import * as express from 'express'
 import * as mongoose from 'mongoose'
+import { enabled as mongoEnabled, url as mongoUrl } from './config/mongo'
+import { AddressRoutes } from './routes/address.routes';
 import { AvatarRoutes } from './routes/avatar.routes'
 import { BlockRoutes } from './routes/block.routes'
 import { CertificateRoutes } from './routes/certificate.routes'
+import { ElectionRoutes } from './routes/election.routes';
 import { MITRoutes } from './routes/mit.routes'
 import { MSTRoutes } from './routes/mst.routes'
 import { OutputRoutes } from './routes/output.routes'
 import { TransactionRoutes } from './routes/transaction.routes'
-import { AddressRoutes } from './routes/address.routes';
-import { ElectionRoutes } from './routes/election.routes';
 
 class App {
 
@@ -23,7 +24,6 @@ class App {
   public blockRoutes: BlockRoutes = new BlockRoutes()
   public certificateRoutes: CertificateRoutes = new CertificateRoutes()
   public electionRoutes: ElectionRoutes = new ElectionRoutes()
-  public mongoUrl: string = (process.env.MONGO_URL) ? process.env.MONGO_URL : 'mongodb://localhost:27017/testnet'
 
   constructor() {
     this.app = express()
@@ -37,7 +37,11 @@ class App {
     this.blockRoutes.routes(this.app)
     this.certificateRoutes.routes(this.app)
     this.electionRoutes.routes(this.app)
-    this.mongoSetup()
+    if (mongoEnabled) {
+      this.mongoSetup()
+    } else {
+      console.log(`mongodb disabled by config`)
+    }
   }
 
   private config(): void {
@@ -53,8 +57,10 @@ class App {
     })
   }
 
-  private mongoSetup(): void {
-    mongoose.connect(this.mongoUrl, { useNewUrlParser: true })
+  private async mongoSetup(): Promise<void> {
+    console.debug('connect to mongodb')
+    mongoose.connect(mongoUrl, { useNewUrlParser: true })
+    console.info('connected to mongodb')
   }
 
 }

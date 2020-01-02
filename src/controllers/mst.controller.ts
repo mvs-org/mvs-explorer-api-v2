@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import * as mongoose from 'mongoose'
-import { MSTSchema } from '../models/mst.model'
 import { AddressBalances } from '../models/address_balances.model'
+import { MSTSchema } from '../models/mst.model'
 import { ResponseError, ResponseSuccess } from './../helpers/message.helper'
 
 const Asset = mongoose.model('Asset', MSTSchema)
@@ -85,12 +85,12 @@ export class MSTController {
     const lastAddress = req.query.lastAddress
     const limit = Math.min(req.query.limit || 20, 100)
     const min = req.query.min || 1
-    let lastAddressBalance = undefined
+    let lastAddressBalance
     if (req.query.lastAddress) {
       const balances = await AddressBalances.findOne({ _id: lastAddress })
       lastAddressBalance = balances ? balances.toObject().value.get(symbol) : undefined
       if (!lastAddressBalance) {
-        //Wrong lastAddress or no balance for this MST
+        // Wrong lastAddress or no balance for this MST
         lastAddressBalance = -1
       }
     }
@@ -110,9 +110,9 @@ export class MSTController {
       .then((fullList) => {
         let i = 0
         if (lastAddress) {
-          i = fullList.findIndex(addressBalance => addressBalance._id == lastAddress) + 1
+          i = fullList.findIndex((addressBalance) => addressBalance._id == lastAddress) + 1
         }
-        let result = fullList.slice(i, i + limit)
+        const result = fullList.slice(i, i + limit)
         if (result && result.length > 0 && result[result.length - 1].toObject()._id == 'coinbase') {
           result.pop()
         }
