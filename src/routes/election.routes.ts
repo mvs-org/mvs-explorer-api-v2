@@ -9,6 +9,7 @@ export class ElectionRoutes {
     app.route('/election/candidates/earlybird').get(this.ElectionController.getCandidatesEarlyBird)
     app.route('/election/votes').get(this.ElectionController.getVotes)
     app.route('/election/result').get(this.ElectionController.getResult)
+    app.route('/election/rewards').get(this.ElectionController.getRewards)
   }
 
 }
