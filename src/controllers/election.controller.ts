@@ -41,7 +41,7 @@ export class ElectionController {
           })
       })
       .then(([height, candidates]) => {
-        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
+        res.setHeader('Cache-Control', 'public, max-age=20, s-maxage=20')
         res.json(new ResponseSuccess({
           candidates: INTERVAL_DNA_VOTE_ON_HOLD ? [] : candidates,
           currentPeriod: CURRENT_PERIOD,
