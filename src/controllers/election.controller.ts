@@ -18,7 +18,8 @@ export const REVOTE_ENABLED = process.env.DNA_REVOTE_ENABLED === 'true'
 export const VOTE_ENABLED = process.env.DNA_VOTE_ENABLED === 'true'
 export const VOTE_ENABLED_UNTIL = process.env.DNA_VOTE_ENABLED_UNTIL ? parseInt(process.env.DNA_VOTE_ENABLED_UNTIL, 10) : undefined
 
-export const DNAVOTE_HOST = process.env.DNAVOTE_HOST || 'https://www.dnavote.com'
+export const DNAVOTE_API_HOST = process.env.DNAVOTE_API_HOST || 'https://www.dnavote.com'
+export const DNAVOTE_API_KEY = process.env.DNAVOTE_API_KEY || ''
 
 export const INTERVAL_DNA_VOTE_ON_HOLD = (process.env.INTERVAL_DNA_VOTE_ON_HOLD) ? parseInt(process.env.INTERVAL_DNA_VOTE_ON_HOLD) : 0
 export const INTERVAL_DNA_VOTE_EARLY_BIRD_START = (process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_START) ? parseInt(process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_START) : 3090000
@@ -190,7 +191,7 @@ export class ElectionController {
         return query + '&transId=' + txid
       }, '')
 
-      const rewards: IElectionRewardExt[] = await get(DNAVOTE_HOST + '/api/dna-selection/v1/period-vote/reward/transIds?apiKey=mvs&' + txidQuery)
+      const rewards: IElectionRewardExt[] = await get(`${DNAVOTE_API_HOST}/api/dna-selection/v1/period-vote/reward/transIds?apiKey=${DNAVOTE_API_KEY}${txidQuery}`)
         .then((apiResponse) => apiResponse.body.data)
 
       const response = rewards.map((reward) => ({
