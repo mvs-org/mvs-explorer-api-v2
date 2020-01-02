@@ -11,6 +11,8 @@ declare function emit(k, v)
 const Output = mongoose.model('Output', OutputSchema)
 const Block = mongoose.model('Block', BlockSchema)
 
+export const REQUIRED_WALLET_VERSION = process.env.DNA_VOTE_REQUIRED_WALLET_VERSION || '0.8.5'
+
 export const CURRENT_PERIOD = parseInt(process.env.DNA_VOTE_CURRENT_PERIOD, 10) || 0
 export const REVOTE_ENABLED = process.env.DNA_REVOTE_ENABLED === 'true'
 export const VOTE_ENABLED = process.env.DNA_VOTE_ENABLED === 'true'
@@ -54,6 +56,7 @@ export class ElectionController {
           voteEndHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_END,
           voteEndTime: VOTE_ENABLED_UNTIL,
           voteStartHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
+          walletVersionSupport: REQUIRED_WALLET_VERSION,
         }))
       }).catch((err) => {
         console.error(err)
