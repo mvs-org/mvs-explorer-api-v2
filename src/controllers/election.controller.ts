@@ -126,7 +126,7 @@ export class ElectionController {
         }
       })))
       .then((result) => {
-        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
         res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)
@@ -168,7 +168,7 @@ export class ElectionController {
         mapResult.results.forEach((candidate) => {
           result[candidate._id] = candidate.value
         })
-        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
         res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)
@@ -200,7 +200,7 @@ export class ElectionController {
         reward: reward.reward,
         txid: reward.transactionId,
       }))
-
+      res.setHeader('Cache-Control', 'public, max-age=1200, s-maxage=1200')
       res.json(new ResponseSuccess(response))
     } catch (err) {
       switch (err.message) {

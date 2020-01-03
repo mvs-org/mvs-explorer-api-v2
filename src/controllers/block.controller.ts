@@ -16,7 +16,7 @@ export class BlockController {
       })
       .limit(1)
       .then((result) => {
-        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
+        res.setHeader('Cache-Control', 'public, max-age=10, s-maxage=10')
         res.json(new ResponseSuccess(result[0].toObject().number))
       }).catch((err) => {
         console.error(err)
@@ -38,7 +38,7 @@ export class BlockController {
       .limit(20)
       .then((result) => {
         if (last_known) {
-          res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600')
+          res.setHeader('Cache-Control', 'public, max-age=1800, s-maxage=1800')
         } else {
           res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
         }
@@ -51,8 +51,8 @@ export class BlockController {
 
   public getHeightFromTimestamp(req: Request, res: Response) {
 
-    const timestamp = parseInt(req.params.timestamp)
-    const current_time = Date.now()/1000
+    const timestamp = parseInt(req.params.timestamp, 10)
+    const current_time = Date.now() / 1000
     const blocktime_range = 10000
 
     if (timestamp < current_time) {
