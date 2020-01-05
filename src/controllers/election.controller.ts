@@ -123,6 +123,7 @@ export class ElectionController {
           lockedUntil: output.vote.get('lockedUntil'),
           quantity: output.attachment.get('quantity'),
           tx: output.tx,
+          revote: 1,
         }
       })))
       .then((result) => {
