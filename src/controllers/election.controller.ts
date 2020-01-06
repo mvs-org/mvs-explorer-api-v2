@@ -214,4 +214,58 @@ export class ElectionController {
     }
   }
 
+  public async getRevote(req: Request, res: Response) {
+
+    const votesIntervals = [
+      { start: 3085800, end: 2143806, revoteStart: 0, revoteEnd: 0 },
+      { start: 3178006, end: 3227234, revoteStart: 0, revoteEnd: 0 },
+      { start: 3227234, end: 3295551, revoteStart: 0, revoteEnd: 0 },
+    ]
+
+    try {
+      if (req.query.tx === undefined) {
+        throw Error('ERR_TX_MISSING')
+      }
+      const transaction: string = req.query.tx
+      const type: string = 'supernode'
+
+      if (transaction.length !== 64) {
+        throw Error('ERR_INVALID_TXID')
+      }
+
+      const query: any = {
+        'tx': transaction,
+        'vote.type': type,
+      }
+
+      Output.findOne(query)
+        .then((result) => {
+
+          if (result === null) {
+            throw Error('ERR_NOT_VOTE')
+          }
+
+          /*TO DO*/
+
+          res.setHeader('Cache-Control', 'public, max-age=1200, s-maxage=1200')
+          res.json(new ResponseSuccess(result))
+        }).catch((err) => {
+          switch (err.message) {
+            case 'ERR_NOT_VOTE':
+              return res.status(400).json(new ResponseError(err.message))
+          }
+          console.error(err)
+          res.status(500).json(new ResponseError('ERR_GET_REVOTE'))
+        })
+    } catch (err) {
+      switch (err.message) {
+        case 'ERR_TX_MISSING':
+        case 'ERR_INVALID_TXID':
+          return res.status(400).json(new ResponseError(err.message))
+      }
+      console.error(err)
+      res.status(500).json(new ResponseError('ERR_GET_REWARDS'))
+    }
+
+  }
 }
