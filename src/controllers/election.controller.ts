@@ -48,7 +48,7 @@ export class ElectionController {
           voteEndTime: VOTE_ENABLED_UNTIL,
           voteStartHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
           walletVersionSupport: REQUIRED_WALLET_VERSION,
-          viteUnlock: ELECTION_PERIODS_UNLOCK
+          votesUnlockPeriods: ELECTION_PERIODS_UNLOCK
         }))
       }).catch((err) => {
         console.error(err)
