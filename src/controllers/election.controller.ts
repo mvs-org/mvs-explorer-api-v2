@@ -6,7 +6,7 @@ import { BlockSchema } from '../models/block.model'
 import { TransactionSchema } from '../models/transaction.model'
 import { OutputSchema } from '../models/output.model'
 import { IElectionRewardExt } from '../interfaces/election.interfaces'
-import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK } from '../config/election.config';
+import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END } from '../config/election.config';
 
 declare function emit(k, v)
 
@@ -47,6 +47,7 @@ export class ElectionController {
           voteEndHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_END,
           voteEndTime: VOTE_ENABLED_UNTIL,
           voteStartHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
+          previousVoteEndHeight: INTERVAL_DNA_PREVIOUS_VOTE_END,
           walletVersionSupport: REQUIRED_WALLET_VERSION,
           votesUnlockPeriods: ELECTION_PERIODS_UNLOCK
         }))
