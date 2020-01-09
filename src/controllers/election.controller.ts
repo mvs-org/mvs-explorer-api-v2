@@ -3,28 +3,18 @@ import * as mongoose from 'mongoose'
 import { get } from 'superagent'
 import { ResponseError, ResponseSuccess } from '../helpers/message.helper'
 import { BlockSchema } from '../models/block.model'
+import { TransactionSchema } from '../models/transaction.model'
 import { OutputSchema } from '../models/output.model'
 import { IElectionRewardExt } from '../interfaces/election.interfaces'
+import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END } from '../config/election.config';
 
 declare function emit(k, v)
 
 const Output = mongoose.model('Output', OutputSchema)
 const Block = mongoose.model('Block', BlockSchema)
+const Transaction = mongoose.model('Transaction', TransactionSchema)
 
-export const REQUIRED_WALLET_VERSION = process.env.DNA_VOTE_REQUIRED_WALLET_VERSION || '0.8.5'
 
-export const CURRENT_PERIOD = parseInt(process.env.DNA_VOTE_CURRENT_PERIOD, 10) || 0
-export const REVOTE_ENABLED = process.env.DNA_REVOTE_ENABLED === 'true'
-export const VOTE_ENABLED = process.env.DNA_VOTE_ENABLED === 'true'
-export const VOTE_ENABLED_UNTIL = process.env.DNA_VOTE_ENABLED_UNTIL ? parseInt(process.env.DNA_VOTE_ENABLED_UNTIL, 10) : undefined
-
-export const DNAVOTE_API_HOST = process.env.DNAVOTE_API_HOST || 'https://www.dnavote.com'
-export const DNAVOTE_API_KEY = process.env.DNAVOTE_API_KEY || ''
-
-export const INTERVAL_DNA_VOTE_ON_HOLD = (process.env.INTERVAL_DNA_VOTE_ON_HOLD) ? parseInt(process.env.INTERVAL_DNA_VOTE_ON_HOLD) : 0
-export const INTERVAL_DNA_VOTE_EARLY_BIRD_START = (process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_START) ? parseInt(process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_START) : 3090000
-export const INTERVAL_DNA_VOTE_EARLY_BIRD_END = (process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_END) ? parseInt(process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_END) : 3152000
-export const INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL = (process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL) ? parseInt(process.env.INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL) : 3220000
 
 export class ElectionController {
 
@@ -57,7 +47,9 @@ export class ElectionController {
           voteEndHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_END,
           voteEndTime: VOTE_ENABLED_UNTIL,
           voteStartHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
+          previousVoteEndHeight: INTERVAL_DNA_PREVIOUS_VOTE_END,
           walletVersionSupport: REQUIRED_WALLET_VERSION,
+          votesUnlockPeriods: ELECTION_PERIODS_UNLOCK
         }))
       }).catch((err) => {
         console.error(err)
@@ -214,4 +206,106 @@ export class ElectionController {
     }
   }
 
+  public async getRevote(req: Request, res: Response) {
+
+    try {
+      const revoteCount = await calculateRevoteCount(req.params.hash)
+      res.json({ revoteCount })
+    } catch (err) {
+      switch (err.message) {
+        case 'ERR_TX_MISSING':
+        case 'ERR_INVALID_TXID':
+          return res.status(400).json(new ResponseError(err.message))
+      }
+      console.error(err)
+      res.status(500).json(new ResponseError('ERR_GET_REWARDS'))
+    }
+
+  }
+
+}
+
+function getVotePeriod(height: number) {
+  for (let i = 0; i < ELECTION_PERIODS.length; i++) {
+    if (height >= ELECTION_PERIODS[i].start && height <= ELECTION_PERIODS[i].end) {
+      return i;
+    }
+  }
+}
+
+function between(x: number, start: number, end: number, inclusive = false) {
+  if (inclusive) {
+    return x >= start && x <= end
+  }
+  return x > start && x < end
+}
+
+async function getVoteTransaction(hash: string) {
+  if (hash === undefined) {
+    throw Error('ERR_TX_MISSING')
+  }
+  // const type: string = 'supernode'
+
+  if (hash.length !== 64) {
+    throw Error('ERR_INVALID_TXID')
+  }
+
+  const query: any = {
+    hash,
+    // 'outputs.vote.type': type,
+  }
+
+  const tx = await Transaction.findOne(query)
+  if (tx === null) {
+    throw Error('ERR_TRANSACTION_NOT_FOUND')
+  }
+  return tx
+}
+
+async function getPreviousVoteTx(tx) {
+  if (tx.inputs && tx.inputs[0] && tx.inputs[0].previous_output) {
+    return await getVoteTransaction(tx.inputs[0].previous_output.hash)
+  }
+}
+
+function getTxVoteOutput(tx: any) {
+  if (tx && tx.outputs && tx.outputs[1] && tx.outputs[1].vote) {
+    return tx.outputs[1]
+  }
+}
+
+function revoteAmountMatch(prevTx, nextTx){
+  const prevOutput = getTxVoteOutput(prevTx)
+  const nextOutput = getTxVoteOutput(nextTx)
+
+  return nextOutput !== undefined
+    && prevOutput !== undefined
+    && nextOutput.attachment.get('quantity') <= prevOutput.attachment.get('quantity') * REVOTE_AMOUNT_THRESHOLD
+    && prevOutput.attachment.get('symbol') === prevOutput.attachment.get('symbol')
+}
+
+function sameVoteDelegate(tx1, tx2) {
+  return getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate && getTxVoteOutput(tx1) !== undefined
+}
+
+async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod = undefined) {
+
+  const tx: any = await getVoteTransaction(hash)
+  if (tx === undefined) {
+    throw Error('Transaction not found')
+  }
+
+  const period = getVotePeriod(tx.height)
+
+  // check of chain is broken
+  if (period === undefined) return counter
+  if (subsequentPeriod && period !== subsequentPeriod - 1) return counter
+
+  counter++
+  // follow chain if previous vote also was a revote
+  const previousVoteTx: any = await getPreviousVoteTx(tx)
+  if (previousVoteTx && sameVoteDelegate(tx, previousVoteTx) && revoteAmountMatch(previousVoteTx, tx) && between(tx.height, ELECTION_PERIODS[period].revoteStart, ELECTION_PERIODS[period].revoteEnd, true)) {
+    return await calculateRevoteCount(previousVoteTx.hash, counter, period)
+  }
+  return counter
 }
