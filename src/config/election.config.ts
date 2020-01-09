@@ -4,6 +4,7 @@ export const CURRENT_PERIOD = parseInt(process.env.DNA_VOTE_CURRENT_PERIOD, 10) 
 export const REVOTE_ENABLED = process.env.DNA_REVOTE_ENABLED === 'true'
 export const VOTE_ENABLED = process.env.DNA_VOTE_ENABLED === 'true'
 export const VOTE_ENABLED_UNTIL = process.env.DNA_VOTE_ENABLED_UNTIL ? parseInt(process.env.DNA_VOTE_ENABLED_UNTIL, 10) : undefined
+export const REVOTE_ENABLED_UNTIL = process.env.REVOTE_ENABLED_UNTIL ? parseInt(process.env.REVOTE_ENABLED_UNTIL, 10) : undefined
 
 export const DNAVOTE_API_HOST = process.env.DNAVOTE_API_HOST || 'https://www.dnavote.com'
 export const DNAVOTE_API_KEY = process.env.DNAVOTE_API_KEY || ''
