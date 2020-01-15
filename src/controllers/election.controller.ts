@@ -6,7 +6,7 @@ import { BlockSchema } from '../models/block.model'
 import { TransactionSchema } from '../models/transaction.model'
 import { OutputSchema } from '../models/output.model'
 import { IElectionRewardExt } from '../interfaces/election.interfaces'
-import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END } from '../config/election.config';
+import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END, REVOTE_ENABLED_UNTIL, CURRENT_PERIOD_REVOTE_START, CURRENT_PERIOD_REVOTE_END } from '../config/election.config';
 
 declare function emit(k, v)
 
@@ -42,14 +42,17 @@ export class ElectionController {
           currentPeriod: CURRENT_PERIOD,
           height,
           lockUntil: INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL,
-          revoteEnabled: REVOTE_ENABLED,
           voteEnabled: VOTE_ENABLED,
+          voteStartHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
           voteEndHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_END,
           voteEndTime: VOTE_ENABLED_UNTIL,
-          voteStartHeight: INTERVAL_DNA_VOTE_EARLY_BIRD_START,
+          revoteEnabled: REVOTE_ENABLED,
+          revoteStartHeight: CURRENT_PERIOD_REVOTE_START,
+          revoteEndHeight: CURRENT_PERIOD_REVOTE_END,
+          revoteEndTime: REVOTE_ENABLED_UNTIL,
           previousVoteEndHeight: INTERVAL_DNA_PREVIOUS_VOTE_END,
           walletVersionSupport: REQUIRED_WALLET_VERSION,
-          votesUnlockPeriods: ELECTION_PERIODS_UNLOCK
+          votesUnlockPeriods: ELECTION_PERIODS_UNLOCK,
         }))
       }).catch((err) => {
         console.error(err)
@@ -190,7 +193,7 @@ export class ElectionController {
       const response = rewards.map((reward) => ({
         amount: reward.voteCount,
         period: reward.lockPeriod,
-        reward: reward.reward,
+        reward: Math.floor(reward.reward*10000)/10000,
         txid: reward.transactionId,
       }))
       res.setHeader('Cache-Control', 'public, max-age=1200, s-maxage=1200')
