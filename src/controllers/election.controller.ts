@@ -193,7 +193,7 @@ export class ElectionController {
       const response = rewards.map((reward) => ({
         amount: reward.voteCount,
         period: reward.lockPeriod,
-        reward: reward.reward,
+        reward: Math.floor(reward.reward*10000)/10000,
         txid: reward.transactionId,
       }))
       res.setHeader('Cache-Control', 'public, max-age=1200, s-maxage=1200')
