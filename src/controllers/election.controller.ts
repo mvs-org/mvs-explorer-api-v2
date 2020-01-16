@@ -218,6 +218,7 @@ export class ElectionController {
       switch (err.message) {
         case 'ERR_TX_MISSING':
         case 'ERR_INVALID_TXID':
+        case 'ERR_TRANSACTION_NOT_FOUND':
           return res.status(400).json(new ResponseError(err.message))
       }
       console.error(err)
@@ -288,7 +289,7 @@ function revoteAmountMatch(prevTx, nextTx){
 }
 
 function sameVoteDelegate(tx1, tx2) {
-  return getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate && getTxVoteOutput(tx1) !== undefined
+  return getTxVoteOutput(tx1) !== undefined && getTxVoteOutput(tx2) !== undefined && getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate
 }
 
 async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod = undefined) {
