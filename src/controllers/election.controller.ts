@@ -267,8 +267,18 @@ async function getVoteTransaction(hash: string) {
 }
 
 async function getPreviousVoteTx(tx) {
-  if (tx.inputs && tx.inputs[0] && tx.inputs[0].previous_output) {
-    return await getVoteTransaction(tx.inputs[0].previous_output.hash)
+  if (tx.inputs) {
+    for(let i=0; i<tx.inputs.length; i++) {
+      let input = tx.inputs[i]
+      if(input.previous_output) {
+        let previous_vote = await getVoteTransaction(input.previous_output.hash)
+        if(getTxVoteOutput(previous_vote)) {
+          return previous_vote
+        }
+        
+      }
+    }
+    return undefined
   }
 }
 

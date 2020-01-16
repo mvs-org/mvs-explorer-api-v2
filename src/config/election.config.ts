@@ -22,6 +22,6 @@ export const CURRENT_PERIOD_REVOTE_END = (process.env.CURRENT_PERIOD_REVOTE_END)
 export const ELECTION_PERIODS_UNLOCK = [3216000, 3288270, 3356586, 3424902, 3493218, 3561534]
 export const ELECTION_PERIODS = [
     { start: 3085800, end: 3143806, revoteStart: 0, revoteEnd: 0 },
-    //{ start: 3178750, end: 3227990, revoteStart: 3216000, revoteEnd: 3220000 },
-    ...(VOTE_ENABLED ? [{ start: INTERVAL_DNA_VOTE_EARLY_BIRD_START, end: 9999999999, revoteStart: CURRENT_PERIOD_REVOTE_START, revoteEnd: CURRENT_PERIOD_REVOTE_END }] : []),
+    { start: 3178750, end: 3227990, revoteStart: 3216000, revoteEnd: 3224037 },
+    //...(VOTE_ENABLED ? [{ start: INTERVAL_DNA_VOTE_EARLY_BIRD_START, end: 9999999999, revoteStart: CURRENT_PERIOD_REVOTE_START, revoteEnd: CURRENT_PERIOD_REVOTE_END }] : []),
 ]
