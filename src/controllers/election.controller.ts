@@ -193,7 +193,7 @@ export class ElectionController {
       const response = rewards.map((reward) => ({
         amount: reward.voteCount,
         period: reward.lockPeriod,
-        reward: reward.reward,
+        reward: Math.floor(reward.reward*10000)/10000,
         txid: reward.transactionId,
       }))
       res.setHeader('Cache-Control', 'public, max-age=1200, s-maxage=1200')
@@ -218,6 +218,7 @@ export class ElectionController {
       switch (err.message) {
         case 'ERR_TX_MISSING':
         case 'ERR_INVALID_TXID':
+        case 'ERR_TRANSACTION_NOT_FOUND':
           return res.status(400).json(new ResponseError(err.message))
       }
       console.error(err)
@@ -266,8 +267,18 @@ async function getVoteTransaction(hash: string) {
 }
 
 async function getPreviousVoteTx(tx) {
-  if (tx.inputs && tx.inputs[0] && tx.inputs[0].previous_output) {
-    return await getVoteTransaction(tx.inputs[0].previous_output.hash)
+  if (tx.inputs) {
+    for(let i=0; i<tx.inputs.length; i++) {
+      let input = tx.inputs[i]
+      if(input.previous_output) {
+        let previous_vote = await getVoteTransaction(input.previous_output.hash)
+        if(getTxVoteOutput(previous_vote)) {
+          return previous_vote
+        }
+        
+      }
+    }
+    return undefined
   }
 }
 
@@ -288,7 +299,7 @@ function revoteAmountMatch(prevTx, nextTx){
 }
 
 function sameVoteDelegate(tx1, tx2) {
-  return getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate && getTxVoteOutput(tx1) !== undefined
+  return getTxVoteOutput(tx1) !== undefined && getTxVoteOutput(tx2) !== undefined && getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate
 }
 
 async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod = undefined) {
