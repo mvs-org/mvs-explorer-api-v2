@@ -23,5 +23,6 @@ export const ELECTION_PERIODS_UNLOCK = [3216000, 3288270, 3356586, 3424902, 3493
 export const ELECTION_PERIODS = [
     { start: 3085800, end: 3143806, revoteStart: 0, revoteEnd: 0 },
     { start: 3178750, end: 3227990, revoteStart: 3216000, revoteEnd: 3224037 },
+    { start: 3232016, end: 3296120, revoteStart: 3288270, revoteEnd: 3228055 },
     //...(VOTE_ENABLED ? [{ start: INTERVAL_DNA_VOTE_EARLY_BIRD_START, end: 9999999999, revoteStart: CURRENT_PERIOD_REVOTE_START, revoteEnd: CURRENT_PERIOD_REVOTE_END }] : []),
 ]
