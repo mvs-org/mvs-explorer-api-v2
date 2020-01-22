@@ -9,7 +9,8 @@
         "watch": "nodemon ./dist/server.js",
         "start": "node ./dist/server.js",
         "prod": "npm run build && npm run start",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "test-election": "./node_modules/mocha/bin/mocha test/testnet-election.test.js"
     },
     "author": "",
     "license": "GPL-3.0",
@@ -20,7 +21,7 @@
         "lodash": "^4.17.15",
         "mongoose": "^5.7.13",
         "redis": "^2.8.0",
-        "superagent": "^5.1.2"
+        "superagent": "^5.2.1"
     },
     "devDependencies": {
         "@types/apicache": "^1.2.0",
@@ -28,6 +29,9 @@
         "@types/mongoose": "^5.5.32",
         "@types/node": "^12.7.2",
         "@types/redis": "^2.8.10",
-        "@types/superagent": "^4.1.4"
+        "@types/superagent": "^4.1.4",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "mocha": "^7.0.0"
     }
 }
