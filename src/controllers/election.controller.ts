@@ -193,7 +193,7 @@ export class ElectionController {
       const response = rewards.map((reward) => ({
         amount: reward.voteCount,
         period: reward.lockPeriod,
-        reward: Math.floor(reward.reward*10000)/10000,
+        reward: Math.floor(reward.reward * 10000) / 10000,
         txid: reward.transactionId,
       }))
       res.setHeader('Cache-Control', 'public, max-age=1200, s-maxage=1200')
@@ -218,11 +218,12 @@ export class ElectionController {
       switch (err.message) {
         case 'ERR_TX_MISSING':
         case 'ERR_INVALID_TXID':
-        case 'ERR_TRANSACTION_NOT_FOUND':
           return res.status(400).json(new ResponseError(err.message))
+        case 'ERR_TRANSACTION_NOT_FOUND':
+          return res.status(404).json(new ResponseError(err.message))
       }
       console.error(err)
-      res.status(500).json(new ResponseError('ERR_GET_REWARDS'))
+      res.status(500).json(new ResponseError('ERR_GET_REVOTE'))
     }
 
   }
@@ -268,14 +269,14 @@ async function getVoteTransaction(hash: string) {
 
 async function getPreviousVoteTx(tx) {
   if (tx.inputs) {
-    for(let i=0; i<tx.inputs.length; i++) {
+    for (let i = 0; i < tx.inputs.length; i++) {
       let input = tx.inputs[i]
-      if(input.previous_output) {
+      if (input.previous_output) {
         let previous_vote = await getVoteTransaction(input.previous_output.hash)
-        if(getTxVoteOutput(previous_vote)) {
+        if (getTxVoteOutput(previous_vote)) {
           return previous_vote
         }
-        
+
       }
     }
     return undefined
@@ -288,7 +289,7 @@ function getTxVoteOutput(tx: any) {
   }
 }
 
-function revoteAmountMatch(prevTx, nextTx){
+function revoteAmountMatch(prevTx, nextTx) {
   const prevOutput = getTxVoteOutput(prevTx)
   const nextOutput = getTxVoteOutput(nextTx)
 
@@ -302,24 +303,88 @@ function sameVoteDelegate(tx1, tx2) {
   return getTxVoteOutput(tx1) !== undefined && getTxVoteOutput(tx2) !== undefined && getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate
 }
 
+// async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod = undefined) {
+
+//   const tx: any = await getVoteTransaction(hash)
+//   if (tx === undefined) {
+//     throw Error('Transaction not found')
+//   }
+
+//   const period = getVotePeriod(tx.height)
+
+//   // check of chain is broken
+//   if (period === undefined) return counter
+//   if (subsequentPeriod && period !== subsequentPeriod - 1) return counter
+
+//   counter++
+//   // follow chain if previous vote also was a revote
+//   const previousVoteTx: any = await getPreviousVoteTx(tx)
+//   if (previousVoteTx && sameVoteDelegate(tx, previousVoteTx) && revoteAmountMatch(previousVoteTx, tx) && between(tx.height, ELECTION_PERIODS[period].revoteStart, ELECTION_PERIODS[period].revoteEnd, true)) {
+//     return await calculateRevoteCount(previousVoteTx.hash, counter, period)
+//   }
+//   return counter
+// }
+
+function getVoteBeginPeriod(height: number) {
+  for (let i = 0; i < ELECTION_PERIODS.length; i++) {
+    if (height >= ELECTION_PERIODS[i].start && height <= ELECTION_PERIODS[i].end) {
+      return i;
+    }
+  }
+}
+
+function getVotePeriodLength(startPeriod: number, unlockHeight: number) {
+  let endPeriod = 0
+  for (let i = 0; i < ELECTION_PERIODS.length; i++) {
+    if (unlockHeight > ELECTION_PERIODS[i].end) {
+      endPeriod = i
+    }
+  }
+  return endPeriod - startPeriod + 1
+}
+
 async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod = undefined) {
 
   const tx: any = await getVoteTransaction(hash)
-  if (tx === undefined) {
-    throw Error('Transaction not found')
+
+  // get the vote of the transaction
+  const voteOutput = getTxVoteOutput(tx)
+  if(voteOutput===undefined){
+    return counter
   }
 
-  const period = getVotePeriod(tx.height)
+  const voteStartPeriod = getVoteBeginPeriod(tx.height)
 
   // check of chain is broken
-  if (period === undefined) return counter
-  if (subsequentPeriod && period !== subsequentPeriod - 1) return counter
+  if (
+    voteStartPeriod === undefined
+  ) {
+    return counter
+  }
 
-  counter++
+  // the transaction should be a vote to reach this code
+  // lets calculate the number of periods this vote was valid for
+  const unlockHeight = tx.height + voteOutput.get('attenuation_model_param').lock_period
+  const votePeriods = getVotePeriodLength(voteStartPeriod, unlockHeight)
+
+  if (subsequentPeriod !== undefined && subsequentPeriod !== voteStartPeriod + votePeriods) {
+    return counter
+  }
+
+  if (subsequentPeriod !== undefined) {
+    counter += votePeriods
+  } else {
+    counter++
+  }
+
   // follow chain if previous vote also was a revote
   const previousVoteTx: any = await getPreviousVoteTx(tx)
-  if (previousVoteTx && sameVoteDelegate(tx, previousVoteTx) && revoteAmountMatch(previousVoteTx, tx) && between(tx.height, ELECTION_PERIODS[period].revoteStart, ELECTION_PERIODS[period].revoteEnd, true)) {
-    return await calculateRevoteCount(previousVoteTx.hash, counter, period)
+  if (previousVoteTx &&
+    sameVoteDelegate(tx, previousVoteTx) &&
+    revoteAmountMatch(previousVoteTx, tx) &&
+    between(tx.height, ELECTION_PERIODS[voteStartPeriod].revoteStart, ELECTION_PERIODS[voteStartPeriod].revoteEnd, true)
+  ) {
+    return await calculateRevoteCount(previousVoteTx.hash, counter, voteStartPeriod)
   }
   return counter
 }
