@@ -347,6 +347,12 @@ async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod 
 
   const tx: any = await getVoteTransaction(hash)
 
+  // get the vote of the transaction
+  const voteOutput = getTxVoteOutput(tx)
+  if(voteOutput===undefined){
+    return counter
+  }
+
   const voteStartPeriod = getVoteBeginPeriod(tx.height)
 
   // check of chain is broken
@@ -358,7 +364,6 @@ async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod 
 
   // the transaction should be a vote to reach this code
   // lets calculate the number of periods this vote was valid for
-  const voteOutput = getTxVoteOutput(tx)
   const unlockHeight = tx.height + voteOutput.get('attenuation_model_param').lock_period
   const votePeriods = getVotePeriodLength(voteStartPeriod, unlockHeight)
 
