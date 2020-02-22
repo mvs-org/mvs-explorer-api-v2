@@ -1,6 +1,7 @@
 const superagent = require('superagent')
 const chai = require("chai"),
-    chaiAsPromised = require("chai-as-promised")
+    chaiAsPromised = require("chai-as-promised"),
+    should = chai.should()
 chai.use(chaiAsPromised);
 
 const API_V2 = 'https://explorer-testnet.mvs.org/api/v2/'
