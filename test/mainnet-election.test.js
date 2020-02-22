@@ -3,21 +3,21 @@ const chai = require("chai"),
     chaiAsPromised = require("chai-as-promised")
 chai.use(chaiAsPromised);
 
-const API_V2 = 'https://explorer-testnet.mvs.org/api/v2/'
+const API_V2 = 'https://explorer.mvs.org/api/v2/'
 
-describe('Election Testnet', function () {
+describe('Election Mainnet', function () {
     describe('Revotes', () => {
         it('Invalid transaction', () => getRevoteCount('abc')
             .should.be.rejected
         )
-        it('No vote transaction', () => getRevoteCount('d4d612297cbecbc2d6438403e751ca83b3eedc58966033016e52889a9a86062e')
+        it('No vote transaction', () => getRevoteCount('2a845dfa63a7c20d40dbc4b15c3e970ef36332b367500fd89307053cb4c1a2c1')
             .should.become(0)
         )
-        it('Simple vote', () => getRevoteCount('f68a5a5c29ff7c50ad78f5b54eb5d5baaabc02a7c6895efb468570d4b3a3d69e')
+        it('Simple vote', () => getRevoteCount('753a1ae13b9ce6483f9ffb08847f5451ec4abef2fc42bdc311b8ef553613f788')
             .should.become(1)
         )
-        it('Simple revote of simple vote', () => getRevoteCount('d98b7534190ed5c67c6cf7108c39516c21e532a518f26f3b0e1e1fe8aa76ff7d')
-            .should.become(2)
+        it('Simple revote of simple vote', () => getRevoteCount('12400c2f66e4f46802c89557e2b67cc1815d6fcafaba8f373d71ba3a928ea7af')
+            .should.become(4)
         )
     })
 })

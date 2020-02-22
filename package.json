@@ -2,15 +2,14 @@
     "name": "mvs-explorer-api-v2",
     "version": "0.1.0",
     "description": "Metaverse explorer API v2",
-    "main": "index.js",
+    "main": "dist/server.js",
     "scripts": {
         "build": "tsc",
         "dev": "ts-node ./src/server.ts",
         "watch": "nodemon ./dist/server.js",
         "start": "node ./dist/server.js",
         "prod": "npm run build && npm run start",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "test-election": "./node_modules/mocha/bin/mocha test/testnet-election.test.js"
+        "test": "./node_modules/mocha/bin/mocha test"
     },
     "author": "",
     "license": "GPL-3.0",
