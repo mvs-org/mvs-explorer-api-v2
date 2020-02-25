@@ -291,6 +291,8 @@ async function getPreviousVoteTx(tx) {
 function getTxVoteOutput(tx: any) {
   if (tx && tx.outputs && tx.outputs[1] && tx.outputs[1].vote) {
     return tx.outputs[1]
+  } else if (tx && tx.outputs && tx.outputs[2] && tx.outputs[2].vote) {
+    return tx.outputs[2]
   }
 }
 
