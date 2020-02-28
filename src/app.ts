@@ -11,6 +11,7 @@ import { MITRoutes } from './routes/mit.routes'
 import { MSTRoutes } from './routes/mst.routes'
 import { OutputRoutes } from './routes/output.routes'
 import { TransactionRoutes } from './routes/transaction.routes'
+import { BlockchainRoutes } from './routes/blockchain.routes';
 
 class App {
 
@@ -24,10 +25,13 @@ class App {
   public blockRoutes: BlockRoutes = new BlockRoutes()
   public certificateRoutes: CertificateRoutes = new CertificateRoutes()
   public electionRoutes: ElectionRoutes = new ElectionRoutes()
+  public blockchainRoutes: BlockchainRoutes = new BlockchainRoutes()
 
   constructor() {
     this.app = express()
     this.config()
+
+    // set routes
     this.transactionRoutes.routes(this.app)
     this.OutputRoutes.routes(this.app)
     this.avatarRoutes.routes(this.app)
@@ -37,6 +41,8 @@ class App {
     this.blockRoutes.routes(this.app)
     this.certificateRoutes.routes(this.app)
     this.electionRoutes.routes(this.app)
+    this.blockchainRoutes.routes(this.app)
+
     if (mongoEnabled) {
       this.mongoSetup()
     } else {
