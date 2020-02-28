@@ -7,6 +7,12 @@ import { TransactionSchema } from '../models/transaction.model'
 import { OutputSchema } from '../models/output.model'
 import { IElectionRewardExt } from '../interfaces/election.interfaces'
 import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END, REVOTE_ENABLED_UNTIL, CURRENT_PERIOD_REVOTE_START, CURRENT_PERIOD_REVOTE_END } from '../config/election.config';
+import { readFileSync, existsSync, readdirSync } from 'fs'
+
+let revoteExceptions = {}
+if(existsSync('./dist/config/exceptions.config.json')){
+  revoteExceptions=JSON.parse(readFileSync('./dist/config/exceptions.config.json').toString()).revotes
+}
 
 declare function emit(k, v)
 
@@ -118,7 +124,6 @@ export class ElectionController {
           lockedUntil: output.vote.get('lockedUntil'),
           quantity: output.attachment.get('quantity'),
           tx: output.tx,
-          revote: 1,
         }
       })))
       .then((result) => {
@@ -286,6 +291,8 @@ async function getPreviousVoteTx(tx) {
 function getTxVoteOutput(tx: any) {
   if (tx && tx.outputs && tx.outputs[1] && tx.outputs[1].vote) {
     return tx.outputs[1]
+  } else if (tx && tx.outputs && tx.outputs[2] && tx.outputs[2].vote) {
+    return tx.outputs[2]
   }
 }
 
@@ -302,28 +309,6 @@ function revoteAmountMatch(prevTx, nextTx) {
 function sameVoteDelegate(tx1, tx2) {
   return getTxVoteOutput(tx1) !== undefined && getTxVoteOutput(tx2) !== undefined && getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate
 }
-
-// async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod = undefined) {
-
-//   const tx: any = await getVoteTransaction(hash)
-//   if (tx === undefined) {
-//     throw Error('Transaction not found')
-//   }
-
-//   const period = getVotePeriod(tx.height)
-
-//   // check of chain is broken
-//   if (period === undefined) return counter
-//   if (subsequentPeriod && period !== subsequentPeriod - 1) return counter
-
-//   counter++
-//   // follow chain if previous vote also was a revote
-//   const previousVoteTx: any = await getPreviousVoteTx(tx)
-//   if (previousVoteTx && sameVoteDelegate(tx, previousVoteTx) && revoteAmountMatch(previousVoteTx, tx) && between(tx.height, ELECTION_PERIODS[period].revoteStart, ELECTION_PERIODS[period].revoteEnd, true)) {
-//     return await calculateRevoteCount(previousVoteTx.hash, counter, period)
-//   }
-//   return counter
-// }
 
 function getVoteBeginPeriod(height: number) {
   for (let i = 0; i < ELECTION_PERIODS.length; i++) {
@@ -345,7 +330,17 @@ function getVotePeriodLength(startPeriod: number, unlockHeight: number) {
 
 async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod = undefined) {
 
+  if(revoteExceptions[hash]){
+    return revoteExceptions[hash] + counter
+  }
+
   const tx: any = await getVoteTransaction(hash)
+
+  // get the vote of the transaction
+  const voteOutput = getTxVoteOutput(tx)
+  if(voteOutput===undefined){
+    return counter
+  }
 
   const voteStartPeriod = getVoteBeginPeriod(tx.height)
 
@@ -358,7 +353,6 @@ async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod 
 
   // the transaction should be a vote to reach this code
   // lets calculate the number of periods this vote was valid for
-  const voteOutput = getTxVoteOutput(tx)
   const unlockHeight = tx.height + voteOutput.get('attenuation_model_param').lock_period
   const votePeriods = getVotePeriodLength(voteStartPeriod, unlockHeight)
 
