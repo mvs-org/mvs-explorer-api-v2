@@ -126,7 +126,7 @@ export class MSTController {
       }))
 
       .then((result) => {
-        res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=1800')
+        res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
         res.json(new ResponseSuccess(result))
       }).catch((err) => {
         console.error(err)
