@@ -64,7 +64,7 @@ export class ElectionController {
           secondaryElectionEnd: SECONDARY_ELECTION_END,
           secondaryVoteEnabledUntil: SECONDARY_VOTE_ENABLED_UNTIL,
           secondaryVoteUnlock: SECONDARY_VOTE_UNLOCK,
-          secondaryCandidates: ['test1', 'test2', 'test3'],
+          secondaryCandidates: candidates,
         }))
       }).catch((err) => {
         console.error(err)
