@@ -26,7 +26,8 @@ export class ElectionController {
 
   public getInfo(req: Request, res: Response) {
 
-    get(DNAVOTE_API_HOST + '/api/dna-selection/v1/period/simple-info')
+    //get(DNAVOTE_API_HOST + '/api/dna-selection/v1/period/simple-info')
+    get('http://tulipex-uat-dnavote-1731513089.us-east-1.elb.amazonaws.com/api/dna-selection/v1/period/simple-info?period=292')
       .then((apiResponse) => apiResponse.body.data.periodSelections)
       .then((selections) => Promise.all(selections.map((selection) => selection.selectionName)))
       .then((candidates) => {
