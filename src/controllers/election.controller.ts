@@ -6,7 +6,7 @@ import { BlockSchema } from '../models/block.model'
 import { TransactionSchema } from '../models/transaction.model'
 import { OutputSchema } from '../models/output.model'
 import { IElectionRewardExt } from '../interfaces/election.interfaces'
-import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END, REVOTE_ENABLED_UNTIL, CURRENT_PERIOD_REVOTE_START, CURRENT_PERIOD_REVOTE_END } from '../config/election.config';
+import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END, REVOTE_ENABLED_UNTIL, CURRENT_PERIOD_REVOTE_START, CURRENT_PERIOD_REVOTE_END, SECONDARY_VOTE_ENABLED, SECONDARY_ELECTION_START, SECONDARY_ELECTION_END, SECONDARY_VOTE_ENABLED_UNTIL, SECONDARY_VOTE_UNLOCK } from '../config/election.config';
 import { readFileSync, existsSync, readdirSync } from 'fs'
 
 let revoteExceptions = {}
@@ -59,6 +59,12 @@ export class ElectionController {
           previousVoteEndHeight: INTERVAL_DNA_PREVIOUS_VOTE_END,
           walletVersionSupport: REQUIRED_WALLET_VERSION,
           votesUnlockPeriods: ELECTION_PERIODS_UNLOCK,
+          secondaryVoteEnabled: SECONDARY_VOTE_ENABLED,
+          secondaryElectionStart: SECONDARY_ELECTION_START,
+          secondaryElectionEnd: SECONDARY_ELECTION_END,
+          secondaryVoteEnabledUntil: SECONDARY_VOTE_ENABLED_UNTIL,
+          secondaryVoteUnlock: SECONDARY_VOTE_UNLOCK,
+          secondaryCandidates: candidates,
         }))
       }).catch((err) => {
         console.error(err)
