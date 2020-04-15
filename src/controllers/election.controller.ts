@@ -59,7 +59,7 @@ export class ElectionController {
           previousVoteEndHeight: INTERVAL_DNA_PREVIOUS_VOTE_END,
           walletVersionSupport: REQUIRED_WALLET_VERSION,
           votesUnlockPeriods: ELECTION_PERIODS_UNLOCK,
-          secondaryVoteEnabled: SECONDARY_VOTE_ENABLED,
+          secondaryVoteEnabled: false,
           secondaryElectionStart: SECONDARY_ELECTION_START,
           secondaryElectionEnd: SECONDARY_ELECTION_END,
           secondaryVoteEnabledUntil: SECONDARY_VOTE_ENABLED_UNTIL,
