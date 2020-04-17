@@ -127,7 +127,7 @@ export class ElectionController {
           asset: output.attachment.symbol,
           candidate: output.vote.get('candidate'),
           lockedAt: output.height,
-          lockedUntil: output.vote.get('lockedUntil'),
+          lockedUntil: Math.min(output.vote.get('lockedUntil'), 100000000),
           quantity: output.attachment.get('quantity'),
           tx: output.tx,
         }
