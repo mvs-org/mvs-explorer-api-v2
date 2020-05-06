@@ -35,3 +35,8 @@ export const ELECTION_PERIODS = [
     { start: 3463380, end: 3501121, revoteStart: 3493218, revoteEnd: 3497226 },
     //...(VOTE_ENABLED ? [{ start: INTERVAL_DNA_VOTE_EARLY_BIRD_START, end: 9999999999, revoteStart: CURRENT_PERIOD_REVOTE_START, revoteEnd: CURRENT_PERIOD_REVOTE_END }] : []),
 ]
+
+export const SECONDARY_ELECTION_PERIODS = [
+    { start: 3584650, end: 3665300, revoteStart: 0, revoteEnd: 0 },
+    { start: 3670000, end: 3400000, revoteStart: 3670000, revoteEnd: 3400000 },
+]
