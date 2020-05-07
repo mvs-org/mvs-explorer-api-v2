@@ -65,6 +65,10 @@ export class ElectionController {
           secondaryVoteEnabledUntil: SECONDARY_VOTE_ENABLED_UNTIL,
           secondaryVoteUnlock: SECONDARY_VOTE_UNLOCK,
           secondaryCandidates: candidates,
+          secondaryRevoteEnabled: SECONDARY_VOTE_ENABLED,
+          secondaryRevoteStartHeight: CURRENT_PERIOD_REVOTE_START,
+          secondaryRevoteEndHeight: CURRENT_PERIOD_REVOTE_END,
+          secondaryRevoteEndTime: REVOTE_ENABLED_UNTIL,
         }))
       }).catch((err) => {
         console.error(err)
