@@ -6,7 +6,7 @@ import { BlockSchema } from '../models/block.model'
 import { TransactionSchema } from '../models/transaction.model'
 import { OutputSchema } from '../models/output.model'
 import { IElectionRewardExt } from '../interfaces/election.interfaces'
-import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END, REVOTE_ENABLED_UNTIL, CURRENT_PERIOD_REVOTE_START, CURRENT_PERIOD_REVOTE_END, SECONDARY_VOTE_ENABLED, SECONDARY_ELECTION_START, SECONDARY_ELECTION_END, SECONDARY_VOTE_ENABLED_UNTIL, SECONDARY_VOTE_UNLOCK } from '../config/election.config';
+import { DNAVOTE_API_HOST, INTERVAL_DNA_VOTE_ON_HOLD, CURRENT_PERIOD, INTERVAL_DNA_VOTE_EARLY_BIRD_LOCK_UNTIL, REVOTE_ENABLED, VOTE_ENABLED, INTERVAL_DNA_VOTE_EARLY_BIRD_END, VOTE_ENABLED_UNTIL, INTERVAL_DNA_VOTE_EARLY_BIRD_START, REQUIRED_WALLET_VERSION, DNAVOTE_API_KEY, ELECTION_PERIODS, REVOTE_AMOUNT_THRESHOLD, ELECTION_PERIODS_UNLOCK, INTERVAL_DNA_PREVIOUS_VOTE_END, REVOTE_ENABLED_UNTIL, CURRENT_PERIOD_REVOTE_START, CURRENT_PERIOD_REVOTE_END, SECONDARY_VOTE_ENABLED, SECONDARY_ELECTION_START, SECONDARY_ELECTION_END, SECONDARY_VOTE_ENABLED_UNTIL, SECONDARY_VOTE_UNLOCK, SECONDARY_ELECTION_PERIODS } from '../config/election.config';
 import { readFileSync, existsSync, readdirSync } from 'fs'
 
 let revoteExceptions = {}
@@ -27,7 +27,7 @@ export class ElectionController {
   public getInfo(req: Request, res: Response) {
 
     //get(DNAVOTE_API_HOST + '/api/dna-selection/v1/period/simple-info')
-    get('http://tulipex-uat-dnavote-1731513089.us-east-1.elb.amazonaws.com/api/dna-selection/v1/period/simple-info?period=292')
+    get('http://tulipex-uat-dnavote-1731513089.us-east-1.elb.amazonaws.com/api/dna-selection/v1/period/simple-info')
       .then((apiResponse) => apiResponse.body.data.periodSelections)
       .then((selections) => Promise.all(selections.map((selection) => selection.selectionName)))
       .then((candidates) => {
@@ -66,6 +66,10 @@ export class ElectionController {
           secondaryVoteEnabledUntil: SECONDARY_VOTE_ENABLED_UNTIL,
           secondaryVoteUnlock: SECONDARY_VOTE_UNLOCK,
           secondaryCandidates: candidates,
+          secondaryRevoteEnabled: SECONDARY_VOTE_ENABLED,
+          secondaryRevoteStartHeight: CURRENT_PERIOD_REVOTE_START,
+          secondaryRevoteEndHeight: CURRENT_PERIOD_REVOTE_END,
+          secondaryRevoteEndTime: REVOTE_ENABLED_UNTIL,
         }))
       }).catch((err) => {
         console.error(err)
@@ -128,7 +132,7 @@ export class ElectionController {
           asset: output.attachment.symbol,
           candidate: output.vote.get('candidate'),
           lockedAt: output.height,
-          lockedUntil: output.vote.get('lockedUntil'),
+          lockedUntil: Math.min(output.vote.get('lockedUntil'), 100000000),
           quantity: output.attachment.get('quantity'),
           tx: output.tx,
         }
@@ -242,14 +246,6 @@ export class ElectionController {
 
 }
 
-function getVotePeriod(height: number) {
-  for (let i = 0; i < ELECTION_PERIODS.length; i++) {
-    if (height >= ELECTION_PERIODS[i].start && height <= ELECTION_PERIODS[i].end) {
-      return i;
-    }
-  }
-}
-
 function between(x: number, start: number, end: number, inclusive = false) {
   if (inclusive) {
     return x >= start && x <= end
@@ -317,18 +313,18 @@ function sameVoteDelegate(tx1, tx2) {
   return getTxVoteOutput(tx1) !== undefined && getTxVoteOutput(tx2) !== undefined && getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate
 }
 
-function getVoteBeginPeriod(height: number) {
-  for (let i = 0; i < ELECTION_PERIODS.length; i++) {
-    if (height >= ELECTION_PERIODS[i].start && height <= ELECTION_PERIODS[i].end) {
+function getVoteBeginPeriod(periods: Array<any>, height: number) {
+  for (let i = 0; i < periods.length; i++) {
+    if (height >= periods[i].start && height <= periods[i].end) {
       return i;
     }
   }
 }
 
-function getVotePeriodLength(startPeriod: number, unlockHeight: number) {
+function getVotePeriodLength(periods: Array<any>, startPeriod: number, unlockHeight: number) {
   let endPeriod = 0
-  for (let i = 0; i < ELECTION_PERIODS.length; i++) {
-    if (unlockHeight > ELECTION_PERIODS[i].end) {
+  for (let i = 0; i < periods.length; i++) {
+    if (unlockHeight > periods[i].end) {
       endPeriod = i
     }
   }
@@ -349,7 +345,9 @@ async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod 
     return counter
   }
 
-  const voteStartPeriod = getVoteBeginPeriod(tx.height)
+  let periods = voteOutput.vote.get('type') == 'secondarynode' ? SECONDARY_ELECTION_PERIODS : ELECTION_PERIODS
+
+  const voteStartPeriod = getVoteBeginPeriod(periods, tx.height)
 
   // check of chain is broken
   if (
@@ -361,7 +359,7 @@ async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod 
   // the transaction should be a vote to reach this code
   // lets calculate the number of periods this vote was valid for
   const unlockHeight = tx.height + voteOutput.get('attenuation_model_param').lock_period
-  const votePeriods = getVotePeriodLength(voteStartPeriod, unlockHeight)
+  const votePeriods = getVotePeriodLength(periods, voteStartPeriod, unlockHeight)
 
   if (subsequentPeriod !== undefined && subsequentPeriod !== voteStartPeriod + votePeriods) {
     return counter
@@ -378,7 +376,7 @@ async function calculateRevoteCount(hash: string, counter = 0, subsequentPeriod 
   if (previousVoteTx &&
     sameVoteDelegate(tx, previousVoteTx) &&
     revoteAmountMatch(previousVoteTx, tx) &&
-    between(tx.height, ELECTION_PERIODS[voteStartPeriod].revoteStart, ELECTION_PERIODS[voteStartPeriod].revoteEnd, true)
+    between(tx.height, periods[voteStartPeriod].revoteStart, periods[voteStartPeriod].revoteEnd, true)
   ) {
     return await calculateRevoteCount(previousVoteTx.hash, counter, voteStartPeriod)
   }
