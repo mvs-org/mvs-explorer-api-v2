@@ -20,10 +20,10 @@ export const CURRENT_PERIOD_REVOTE_START = (process.env.CURRENT_PERIOD_REVOTE_ST
 export const CURRENT_PERIOD_REVOTE_END = (process.env.CURRENT_PERIOD_REVOTE_END) ? parseInt(process.env.CURRENT_PERIOD_REVOTE_END) : 3220000
 
 export const SECONDARY_VOTE_ENABLED = process.env.SECONDARY_VOTE_ENABLED === 'true'
-export const SECONDARY_ELECTION_START = (process.env.SECONDARY_ELECTION_START) ? parseInt(process.env.SECONDARY_ELECTION_START) : 3584650
-export const SECONDARY_ELECTION_END = (process.env.SECONDARY_ELECTION_END) ? parseInt(process.env.SECONDARY_ELECTION_END) : 3665150
+export const SECONDARY_ELECTION_START = (process.env.SECONDARY_ELECTION_START) ? parseInt(process.env.SECONDARY_ELECTION_START) : 3673600
+export const SECONDARY_ELECTION_END = (process.env.SECONDARY_ELECTION_END) ? parseInt(process.env.SECONDARY_ELECTION_END) : 3685850
 export const SECONDARY_VOTE_ENABLED_UNTIL = process.env.SECONDARY_VOTE_ENABLED_UNTIL ? parseInt(process.env.SECONDARY_VOTE_ENABLED_UNTIL, 10) : undefined
-export const SECONDARY_VOTE_UNLOCK = (process.env.SECONDARY_VOTE_UNLOCK) ? parseInt(process.env.SECONDARY_VOTE_UNLOCK) : 3673100
+export const SECONDARY_VOTE_UNLOCK = (process.env.SECONDARY_VOTE_UNLOCK) ? parseInt(process.env.SECONDARY_VOTE_UNLOCK) : 3830403
 export const PREVIOUS_SECONDARY_VOTE_END = (process.env.PREVIOUS_SECONDARY_VOTE_END) ? parseInt(process.env.PREVIOUS_SECONDARY_VOTE_END) : 3665300
 
 export const ELECTION_PERIODS_UNLOCK = [3216000, 3288270, 3356586, 3424902, 3493218, 3561534]
@@ -39,5 +39,5 @@ export const ELECTION_PERIODS = [
 
 export const SECONDARY_ELECTION_PERIODS = [
     { start: 3584650, end: 3665300, revoteStart: 0, revoteEnd: 0 },
-    { start: 3670000, end: 3400000, revoteStart: 3670000, revoteEnd: 3400000 },
+    { start: 3673600, end: 3685850, revoteStart: 3673600, revoteEnd: 3685850 },
 ]
