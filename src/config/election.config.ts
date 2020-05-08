@@ -39,6 +39,5 @@ export const ELECTION_PERIODS = [
 ]
 
 export const SECONDARY_ELECTION_PERIODS = [
-    { start: 3584650, end: 3665300, revoteStart: 0, revoteEnd: 0 },
-    { start: 3673600, end: 3685850, revoteStart: 3673600, revoteEnd: 3685850 },
+    { start: 3673600, end: 3685850, revoteStart: 0, revoteEnd: 0 },
 ]
