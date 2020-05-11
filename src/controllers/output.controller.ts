@@ -20,6 +20,9 @@ const outputFormat = {
   index: 1,
   locked_height_range: 1,
   script: 1,
+  spent_height: 1,
+  spent_index: 1,
+  spent_tx: 1,
   tx: 1,
   value: 1,
 }
@@ -36,10 +39,19 @@ export class OutputController {
     const txid = req.params.txid
     const index = parseInt(req.params.index, 10)
     try {
-      const output = await Output.findOne({ tx: txid, index }, outputFormat)
+      const output = await Output.findOne({ tx: txid, index }, outputFormat).lean()
       if (output == null) {
         throw Error('ERR_OUTPUT_NOT_FOUND')
       }
+      let spent = {
+        tx: output.spent_tx,
+        index: output.spent_index,
+        height: output.spent_height,
+      }
+      output.spent = output.spent_tx ? spent : null
+      delete output.spent_tx
+      delete output.spent_index
+      delete output.spent_height
       res.json(new ResponseSuccess(output))
     } catch (error) {
       switch (error.message) {
