@@ -69,6 +69,7 @@ export class OutputController {
     const maxHeight = parseInt(req.query.maxheight, 10) || 0
     const target = req.query.target ? parseInt(req.query.target, 10) : UTXO_TARGET_DEFAULT
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : UTXO_LIMIT_COUNT_DEFAULT
+    const symbol = req.query.symbol.toUpperCase().replace(/\./g, '_') || 'ETP'
 
     const sortOptions: IUtxoSortOption = {}
     try {
@@ -83,10 +84,18 @@ export class OutputController {
           sortOptions.height = 1
           break
         case 'high':
-          sortOptions.value = -1
+          if(symbol == 'ETP') {
+            sortOptions.value = -1
+          } else {
+            sortOptions['attachment.quantity'] = -1
+          }
           break
         case 'low':
-          sortOptions.value = 1
+          if(symbol == 'ETP') {
+            sortOptions.value = 1
+          } else {
+            sortOptions['attachment.quantity'] = 1
+          }
           break
         default:
           throw Error('ERR_INVALID_SORT_OPTION')
@@ -102,9 +111,17 @@ export class OutputController {
       address: addresses,
     }]
 
-    query.value = { $gt: UTXO_VALUE_MINIMUM }
-    query['attachment.type'] = 'etp'
-    query.locked_height_range = 0
+    if(symbol == 'ETP') {
+      query.value = { $gt: UTXO_VALUE_MINIMUM }
+      query['attachment.type'] = 'etp'
+      query.locked_height_range = 0
+      
+    } else {
+      query['attachment.symbol'] = symbol
+      query['attachment.quantity'] = { $gt: UTXO_VALUE_MINIMUM }
+      query.attenuation_model_param = null
+    }
+
     query.spent_tx = 0
 
     if (maxHeight > 0) {
