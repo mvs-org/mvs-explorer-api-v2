@@ -65,19 +65,25 @@ export class TransactionController {
   public async getAddressesTransactions(req: Request, res: Response) {
 
     const last_known_height = req.query.min_height || 0
-    const addresses = req.query.addresses
+    const addresses = Array.isArray(req.query.addresses) ? req.query.addresses : [req.query.addresses]
     const NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES =
       process.env.NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES
         ? parseInt(process.env.NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES, 10)
         : 5
+    const jsonFormat = req.query.json==='false' ? false : true 
 
-    const txFormat = {
+    const txFormat = jsonFormat ? {
       _id: 0,
       confirmed_at: 1,
       hash: 1,
       height: 1,
       inputs: 1,
       outputs: 1,
+    } : {
+      _id: 0,
+      hash: 1,
+      rawtx: 1,
+      height: 1,
     }
 
     async function loadAddressesTxs(addresses: string[], last_known_height: number, limit: number) {
