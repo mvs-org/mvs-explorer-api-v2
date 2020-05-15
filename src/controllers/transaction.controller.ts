@@ -8,7 +8,25 @@ const Transaction = mongoose.model('Tx', TransactionSchema)
 
 export class TransactionController {
 
-  public getTransactions(req: Request, res: Response) {
+  async getTransaction(req: Request, res: Response) {
+    const txid = req.params.txid
+    const jsonFormat = req.query.json === 'false' ? false : true
+
+    const tx = await Transaction.findOne({ hash: txid }).sort({ orphan: 1 }).lean()
+
+    if (!tx) {
+      res.status(400).json(new ResponseError('ERR_GET_TRANSACTION'))
+    }
+
+    const { _id, rawtx, ...txdata } = tx
+
+    res.json(new ResponseSuccess(
+      jsonFormat ? txdata : { hash: tx.hash, height: tx.height, rawtx }
+    ))
+
+  }
+
+  getTransactions(req: Request, res: Response) {
 
     const last_known = req.query.last_known
     const min_time = req.query.min_time
@@ -70,7 +88,7 @@ export class TransactionController {
       process.env.NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES
         ? parseInt(process.env.NUMBER_OF_TRANSACTIONS_FOR_ADDRESSES, 10)
         : 5
-    const jsonFormat = req.query.json==='false' ? false : true 
+    const jsonFormat = req.query.json === 'false' ? false : true
 
     const txFormat = jsonFormat ? {
       _id: 0,
@@ -80,11 +98,11 @@ export class TransactionController {
       inputs: 1,
       outputs: 1,
     } : {
-      _id: 0,
-      hash: 1,
-      rawtx: 1,
-      height: 1,
-    }
+        _id: 0,
+        hash: 1,
+        rawtx: 1,
+        height: 1,
+      }
 
     async function loadAddressesTxs(addresses: string[], last_known_height: number, limit: number) {
       const query: any = { orphan: 0 }
@@ -139,7 +157,7 @@ export class TransactionController {
 
     const blockhash = req.query.hash
     const blockheight = req.query.height
-    if(!blockhash && !blockheight) {
+    if (!blockhash && !blockheight) {
       res.status(400).json(new ResponseError('ERR_BLOCK_NOT_SPECIFIED'))
     }
     const last_known = req.query.last_known
