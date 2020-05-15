@@ -18,10 +18,10 @@ export class TransactionController {
       res.status(400).json(new ResponseError('ERR_GET_TRANSACTION'))
     }
 
-    const { _id, rawtx, ...txdata } = tx
+    const { _id, rawtx, orphan, ...txdata } = tx
 
     res.json(new ResponseSuccess(
-      jsonFormat ? txdata : { hash: tx.hash, height: tx.height, rawtx }
+      jsonFormat ? {...txdata, status: orphan} : { hash: tx.hash, height: tx.height, rawtx }
     ))
 
   }
