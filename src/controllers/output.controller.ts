@@ -20,6 +20,9 @@ const outputFormat = {
   index: 1,
   locked_height_range: 1,
   script: 1,
+  spent_height: 1,
+  spent_index: 1,
+  spent_tx: 1,
   tx: 1,
   value: 1,
 }
@@ -36,10 +39,19 @@ export class OutputController {
     const txid = req.params.txid
     const index = parseInt(req.params.index, 10)
     try {
-      const output = await Output.findOne({ tx: txid, index }, outputFormat)
+      const output = await Output.findOne({ tx: txid, index }, outputFormat).lean()
       if (output == null) {
         throw Error('ERR_OUTPUT_NOT_FOUND')
       }
+      let spent = {
+        tx: output.spent_tx,
+        index: output.spent_index,
+        height: output.spent_height,
+      }
+      output.spent = output.spent_tx ? spent : null
+      delete output.spent_tx
+      delete output.spent_index
+      delete output.spent_height
       res.json(new ResponseSuccess(output))
     } catch (error) {
       switch (error.message) {
@@ -57,6 +69,7 @@ export class OutputController {
     const maxHeight = parseInt(req.query.maxheight, 10) || 0
     const target = req.query.target ? parseInt(req.query.target, 10) : UTXO_TARGET_DEFAULT
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : UTXO_LIMIT_COUNT_DEFAULT
+    const symbol = req.query.symbol.toUpperCase().replace(/\./g, '_') || 'ETP'
 
     const sortOptions: IUtxoSortOption = {}
     try {
@@ -71,10 +84,18 @@ export class OutputController {
           sortOptions.height = 1
           break
         case 'high':
-          sortOptions.value = -1
+          if(symbol == 'ETP') {
+            sortOptions.value = -1
+          } else {
+            sortOptions['attachment.quantity'] = -1
+          }
           break
         case 'low':
-          sortOptions.value = 1
+          if(symbol == 'ETP') {
+            sortOptions.value = 1
+          } else {
+            sortOptions['attachment.quantity'] = 1
+          }
           break
         default:
           throw Error('ERR_INVALID_SORT_OPTION')
@@ -90,9 +111,17 @@ export class OutputController {
       address: addresses,
     }]
 
-    query.value = { $gt: UTXO_VALUE_MINIMUM }
-    query['attachment.type'] = 'etp'
-    query.locked_height_range = 0
+    if(symbol == 'ETP') {
+      query.value = { $gt: UTXO_VALUE_MINIMUM }
+      query['attachment.type'] = 'etp'
+      query.locked_height_range = 0
+      
+    } else {
+      query['attachment.symbol'] = symbol
+      query['attachment.quantity'] = { $gt: UTXO_VALUE_MINIMUM }
+      query.attenuation_model_param = null
+    }
+
     query.spent_tx = 0
 
     if (maxHeight > 0) {
