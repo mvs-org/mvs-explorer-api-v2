@@ -140,7 +140,7 @@ export class OutputController {
           let tmpTarget = 0
           for (const utxo of resultSet) {
             selection.push(utxo.toObject())
-            tmpTarget += utxo.toObject().value
+            tmpTarget += symbol == 'ETP' ? utxo.toObject().value : utxo.toObject().attachment.get('quantity')
             if (tmpTarget >= target) {
               return res.json(new ResponseSuccess(selection))
             }
