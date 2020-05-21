@@ -69,7 +69,7 @@ export class OutputController {
     const maxHeight = parseInt(req.query.maxheight, 10) || 0
     const target = req.query.target ? parseInt(req.query.target, 10) : UTXO_TARGET_DEFAULT
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : UTXO_LIMIT_COUNT_DEFAULT
-    const symbol = req.query.symbol.toUpperCase().replace(/\./g, '_') || 'ETP'
+    const symbol = req.query.symbol ? req.query.symbol.toUpperCase().replace(/\./g, '_') : 'ETP'
 
     const sortOptions: IUtxoSortOption = {}
     try {
@@ -140,7 +140,7 @@ export class OutputController {
           let tmpTarget = 0
           for (const utxo of resultSet) {
             selection.push(utxo.toObject())
-            tmpTarget += utxo.toObject().value
+            tmpTarget += symbol == 'ETP' ? utxo.toObject().value : utxo.toObject().attachment.get('quantity')
             if (tmpTarget >= target) {
               return res.json(new ResponseSuccess(selection))
             }
