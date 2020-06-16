@@ -6,7 +6,7 @@ export const VOTE_ENABLED = process.env.DNA_VOTE_ENABLED === 'true'
 export const VOTE_ENABLED_UNTIL = process.env.DNA_VOTE_ENABLED_UNTIL ? parseInt(process.env.DNA_VOTE_ENABLED_UNTIL, 10) : undefined
 export const REVOTE_ENABLED_UNTIL = process.env.DNA_REVOTE_ENABLED_UNTIL ? parseInt(process.env.DNA_REVOTE_ENABLED_UNTIL, 10) : undefined
 
-export const DNAVOTE_API_HOST = process.env.DNAVOTE_API_HOST || 'https://www.dnavote.com'
+export const DNAVOTE_API_HOST = process.env.DNAVOTE_API_HOST || 'https://api.dna-election.com'
 export const DNAVOTE_API_KEY = process.env.DNAVOTE_API_KEY || ''
 
 export const REVOTE_AMOUNT_THRESHOLD = 1.2
@@ -43,5 +43,5 @@ export const ELECTION_PERIODS = [
 
 export const SECONDARY_ELECTION_PERIODS = [
     { start: 3673600, end: 3686000, revoteStart: 0, revoteEnd: 0 },
-    { start: 3722000, end: 3843000, revoteStart: 0, revoteEnd: 0 },
+    { start: 3722000, end: 3843000, revoteStart: 3830650, revoteEnd: 3834650 },
 ]
