@@ -310,7 +310,7 @@ function revoteAmountMatch(prevTx, nextTx) {
 }
 
 function sameVoteDelegate(tx1, tx2) {
-  return getTxVoteOutput(tx1) !== undefined && getTxVoteOutput(tx2) !== undefined && getTxVoteOutput(tx1).vote.candidate === getTxVoteOutput(tx2).vote.candidate
+  return getTxVoteOutput(tx1) !== undefined && getTxVoteOutput(tx2) !== undefined && getTxVoteOutput(tx1).vote.get('candidate') === getTxVoteOutput(tx2).vote.get('candidate')
 }
 
 function getVoteBeginPeriod(periods: Array<any>, height: number) {
