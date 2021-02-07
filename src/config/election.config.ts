@@ -6,7 +6,7 @@ export const VOTE_ENABLED = process.env.DNA_VOTE_ENABLED === 'true'
 export const VOTE_ENABLED_UNTIL = process.env.DNA_VOTE_ENABLED_UNTIL ? parseInt(process.env.DNA_VOTE_ENABLED_UNTIL, 10) : undefined
 export const REVOTE_ENABLED_UNTIL = process.env.DNA_REVOTE_ENABLED_UNTIL ? parseInt(process.env.DNA_REVOTE_ENABLED_UNTIL, 10) : undefined
 
-export const DNAVOTE_API_HOST = process.env.DNAVOTE_API_HOST || 'https://www.dnavote.com'
+export const DNAVOTE_API_HOST = process.env.DNAVOTE_API_HOST || 'https://api.dna-election.com'
 export const DNAVOTE_API_KEY = process.env.DNAVOTE_API_KEY || ''
 
 export const REVOTE_AMOUNT_THRESHOLD = 1.2
@@ -26,6 +26,9 @@ export const SECONDARY_VOTE_ENABLED_UNTIL = process.env.SECONDARY_VOTE_ENABLED_U
 export const SECONDARY_VOTE_UNLOCK = (process.env.SECONDARY_VOTE_UNLOCK) ? parseInt(process.env.SECONDARY_VOTE_UNLOCK) : 2660000
 export const PREVIOUS_SECONDARY_VOTE_END = (process.env.PREVIOUS_SECONDARY_VOTE_END) ? parseInt(process.env.PREVIOUS_SECONDARY_VOTE_END) : 2620700
 export const SECONDARY_REVOTE_ENABLED = process.env.SECONDARY_REVOTE_ENABLED === 'true'
+export const SECONDARY_ELECTION_REVOTE_START = (process.env.SECONDARY_ELECTION_REVOTE_START) ? parseInt(process.env.SECONDARY_ELECTION_REVOTE_START) : 3830403
+export const SECONDARY_ELECTION_REVOTE_END = (process.env.SECONDARY_ELECTION_REVOTE_END) ? parseInt(process.env.SECONDARY_ELECTION_REVOTE_END) : 3665300
+export const SECONDARY_REVOTE_ENABLED_UNTIL = process.env.SECONDARY_VOTE_ENABLED_UNTIL ? parseInt(process.env.SECONDARY_VOTE_ENABLED_UNTIL, 10) : undefined
 
 export const ELECTION_PERIODS_UNLOCK = [2390000, 2450000, 2510000, 2570000, 2630000, 2690000, 2750000]
 export const ELECTION_PERIODS = [
