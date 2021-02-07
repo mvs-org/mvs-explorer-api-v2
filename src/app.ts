@@ -12,6 +12,7 @@ import { MSTRoutes } from './routes/mst.routes'
 import { OutputRoutes } from './routes/output.routes'
 import { TransactionRoutes } from './routes/transaction.routes'
 import { BlockchainRoutes } from './routes/blockchain.routes';
+import { VmRoutes } from './routes/vm.routes'
 
 class App {
 
@@ -26,6 +27,7 @@ class App {
   public certificateRoutes: CertificateRoutes = new CertificateRoutes()
   public electionRoutes: ElectionRoutes = new ElectionRoutes()
   public blockchainRoutes: BlockchainRoutes = new BlockchainRoutes()
+  public vmRoutes: VmRoutes = new VmRoutes()
 
   constructor() {
     this.app = express()
@@ -42,6 +44,7 @@ class App {
     this.certificateRoutes.routes(this.app)
     this.electionRoutes.routes(this.app)
     this.blockchainRoutes.routes(this.app)
+    this.vmRoutes.routes(this.app)
 
     if (mongoEnabled) {
       this.mongoSetup()
