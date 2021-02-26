@@ -9,7 +9,7 @@ export class VmController {
       "open": process.env.SWAP_OPEN_WALLET_VERSION || false,
     }
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
-    res.json(result)
+    res.json(new ResponseSuccess(result))
   }
 
   async getGasEstimation(req: Request, res: Response) {
