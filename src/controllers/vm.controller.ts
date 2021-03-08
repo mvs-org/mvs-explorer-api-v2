@@ -6,7 +6,8 @@ export class VmController {
   async swap(req: Request, res: Response) {
     const result = {
       "minVersion": process.env.SWAP_REQUIRED_WALLET_VERSION || '0.10.3',
-      "open": process.env.SWAP_OPEN_WALLET_VERSION || false,
+      "open": process.env.SWAP_OPEN || false,
+      "showWarning": process.env.SHOW_SWAP_WARNING || true,
     }
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
     res.json(new ResponseSuccess(result))
