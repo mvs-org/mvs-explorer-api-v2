@@ -8,6 +8,7 @@ export class VmController {
       "minVersion": process.env.SWAP_REQUIRED_WALLET_VERSION || '0.10.3',
       "open": process.env.SWAP_OPEN || false,
       "showWarning": process.env.SHOW_SWAP_WARNING || true,
+      "minQuantity": process.env.SWAP_MIN_QUANTITY || 100000000,
     }
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
     res.json(new ResponseSuccess(result))
